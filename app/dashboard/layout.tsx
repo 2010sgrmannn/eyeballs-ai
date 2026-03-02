@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { LogoutButton } from "./logout-button";
 
 export default async function DashboardLayout({
@@ -21,6 +22,12 @@ export default async function DashboardLayout({
       <nav className="flex items-center justify-between border-b border-neutral-800 px-6 py-4">
         <span className="text-lg font-semibold">eyeballs.ai</span>
         <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/settings"
+            className="text-sm text-neutral-400 hover:text-white"
+          >
+            Settings
+          </Link>
           <span className="text-sm text-neutral-400">{user.email}</span>
           <LogoutButton />
         </div>
