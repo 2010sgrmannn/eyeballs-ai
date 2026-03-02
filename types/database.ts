@@ -1,8 +1,9 @@
 // Database entity types matching the Supabase schema
 
 export type Platform = "instagram" | "tiktok" | "linkedin" | "twitter";
-
+export type ScriptStyle = "short" | "medium" | "long";
 export type TagCategory = "niche" | "topic" | "style" | "hook_type" | "emotion";
+export type ContentTagCategory = TagCategory;
 
 export interface Creator {
   id: string;
@@ -13,6 +14,39 @@ export interface Creator {
   follower_count: number | null;
   scraped_at: string | null;
   created_at: string;
+}
+
+export interface ScriptBody {
+  hook: string;
+  body: string;
+  cta: string;
+}
+
+export interface Script {
+  id: string;
+  user_id: string;
+  title: string | null;
+  topic: string | null;
+  script_body: string; // JSON-stringified ScriptBody
+  niche_id: string | null;
+  source_content_ids: string[] | null;
+  platform: Platform | null;
+  script_style: ScriptStyle | null;
+  created_at: string;
+  updated_at: string;
+  niche?: Niche | null;
+}
+
+export interface BrandProfile {
+  id: string;
+  user_id: string;
+  brand_voice: string | null;
+  values: string[] | null;
+  target_audience: string | null;
+  content_style: string | null;
+  niche: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Content {
@@ -44,6 +78,14 @@ export interface ContentTag {
   content_id: string;
   tag: string;
   category: TagCategory | null;
+}
+
+export interface Niche {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
 }
 
 export interface ContentWithRelations extends Content {
