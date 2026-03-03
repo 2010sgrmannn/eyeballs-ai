@@ -230,6 +230,9 @@ export function CanvasBuilder({
         fitViewOptions={{ padding: 0.2 }}
         minZoom={canvasConfig.minZoom}
         maxZoom={canvasConfig.maxZoom}
+        connectionRadius={30}
+        snapToGrid
+        snapGrid={[15, 15]}
         proOptions={{ hideAttribution: true }}
         className="canvas-background"
         onPaneContextMenu={onPaneContextMenu}
