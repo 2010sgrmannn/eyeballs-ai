@@ -10,14 +10,20 @@ interface HeaderProps {
 export function Header({ userEmail, onMenuToggle }: HeaderProps) {
   return (
     <header
-      className="flex items-center justify-between border-b border-neutral-800 bg-neutral-950 px-4 py-3 sm:px-6"
+      className="flex items-center justify-between px-4 py-3 sm:px-6"
+      style={{
+        background: "rgba(9, 17, 26, 0.8)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        borderBottom: "1px solid var(--color-border)",
+      }}
       data-testid="header"
     >
       <div className="flex items-center gap-3">
         {onMenuToggle && (
           <button
             onClick={onMenuToggle}
-            className="p-2 rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white lg:hidden"
+            className="p-2 lg:hidden text-[#888] hover:text-white transition-colors duration-150"
             aria-label="Toggle menu"
             data-testid="menu-toggle"
           >
@@ -26,12 +32,25 @@ export function Header({ userEmail, onMenuToggle }: HeaderProps) {
             </svg>
           </button>
         )}
-        <span className="text-lg font-semibold tracking-tight" data-testid="logo">
-          eyeballs.ai
+        <span
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "15px",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            letterSpacing: "-0.025em",
+          }}
+          data-testid="logo"
+        >
+          EYEBALLS.AI
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <span className="hidden text-sm text-neutral-400 sm:block" data-testid="user-email">
+        <span
+          className="hidden text-xs sm:block"
+          style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#888888" }}
+          data-testid="user-email"
+        >
           {userEmail}
         </span>
         <LogoutButton />

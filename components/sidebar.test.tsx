@@ -66,15 +66,15 @@ describe("Sidebar component", () => {
     expect(source).toContain("aria-label");
   });
 
-  it("active nav item gets highlighted class", async () => {
+  it("active nav item gets highlighted with accent styling", async () => {
     const fs = await import("fs");
     const source = fs.readFileSync(
       new URL("./sidebar.tsx", import.meta.url).pathname,
       "utf-8"
     );
-    // Active state uses bg-neutral-800 text-white
-    expect(source).toContain("bg-neutral-800 text-white");
-    // Inactive state uses text-neutral-400
-    expect(source).toContain("text-neutral-400");
+    // Active state uses accent-muted background and white text
+    expect(source).toContain("--color-accent-muted");
+    expect(source).toContain("--color-accent");
+    expect(source).toContain("text-white");
   });
 });

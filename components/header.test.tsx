@@ -23,7 +23,7 @@ describe("Header component", () => {
       new URL("./header.tsx", import.meta.url).pathname,
       "utf-8"
     );
-    expect(source).toContain("eyeballs.ai");
+    expect(source).toContain("EYEBALLS.AI");
   });
 
   it("renders user email via props", async () => {
@@ -56,13 +56,13 @@ describe("Header component", () => {
     expect(source).toContain("lg:hidden");
   });
 
-  it("uses dark theme border color", async () => {
+  it("uses glass design tokens for styling", async () => {
     const fs = await import("fs");
     const source = fs.readFileSync(
       new URL("./header.tsx", import.meta.url).pathname,
       "utf-8"
     );
-    expect(source).toContain("border-neutral-800");
-    expect(source).toContain("bg-neutral-950");
+    expect(source).toContain("--color-border");
+    expect(source).toContain("backdropFilter");
   });
 });

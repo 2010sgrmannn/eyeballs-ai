@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { Sidebar } from "./sidebar";
 
 interface MobileMenuProps {
@@ -34,20 +35,38 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     }
   }, [isOpen, handleKeyDown]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 lg:hidden" data-testid="mobile-menu">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/60"
-        onClick={onClose}
-        data-testid="mobile-menu-backdrop"
-      />
-      {/* Sidebar panel */}
-      <div className="fixed inset-y-0 left-0 w-64 z-50">
-        <Sidebar className="h-full" />
-      </div>
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" data-testid="mobile-menu">
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0"
+            style={{
+              background: "rgba(0, 0, 0, 0.6)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            data-testid="mobile-menu-backdrop"
+          />
+          {/* Sidebar panel */}
+          <motion.div
+            className="fixed inset-y-0 left-0 w-64 z-50 shadow-2xl glass-card"
+            style={{ borderRadius: 0, borderLeft: "none", borderTop: "none", borderBottom: "none" }}
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          >
+            <Sidebar className="h-full" />
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }

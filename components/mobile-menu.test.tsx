@@ -23,7 +23,7 @@ describe("MobileMenu component", () => {
       "utf-8"
     );
     expect(source).toContain("mobile-menu-backdrop");
-    expect(source).toContain("bg-black/60");
+    expect(source).toContain("rgba(0, 0, 0, 0.6)");
   });
 
   it("closes on escape key", async () => {
@@ -36,13 +36,13 @@ describe("MobileMenu component", () => {
     expect(source).toContain("handleKeyDown");
   });
 
-  it("is hidden when not open via lg:hidden and conditional render", async () => {
+  it("is hidden when not open via lg:hidden and AnimatePresence", async () => {
     const fs = await import("fs");
     const source = fs.readFileSync(
       new URL("./mobile-menu.tsx", import.meta.url).pathname,
       "utf-8"
     );
-    expect(source).toContain("if (!isOpen) return null");
+    expect(source).toContain("AnimatePresence");
     expect(source).toContain("lg:hidden");
   });
 

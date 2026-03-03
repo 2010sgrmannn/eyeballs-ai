@@ -26,7 +26,7 @@ describe("DashboardShell component", () => {
       new URL("./dashboard-shell.tsx", import.meta.url).pathname,
       "utf-8"
     );
-    expect(source).toContain("bg-neutral-950");
+    expect(source).toContain("--color-background");
   });
 
   it("has desktop sidebar hidden on mobile", async () => {
