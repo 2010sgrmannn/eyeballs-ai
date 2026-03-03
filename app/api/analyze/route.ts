@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createAnthropicClient,
   analyzeContent,
+  analyzeContentLocal,
   analyzeContentBatch,
 } from "@/services/analyzer";
 import type {
@@ -53,21 +54,9 @@ export async function POST(request: Request) {
       // Empty body is fine - analyze all unanalyzed content
     }
 
-    // Create Anthropic client (validates API key)
-    let anthropicClient;
-    try {
-      anthropicClient = createAnthropicClient();
-    } catch (err) {
-      return NextResponse.json(
-        {
-          error:
-            err instanceof Error
-              ? err.message
-              : "Failed to initialize AI client",
-        },
-        { status: 500 }
-      );
-    }
+    // Create Anthropic client (null if no API key — will use local CLI)
+    const anthropicClient = createAnthropicClient();
+    const useLocalCli = !anthropicClient;
 
     // Fetch content to analyze
     let query = supabase
@@ -112,11 +101,9 @@ export async function POST(request: Request) {
           follower_count: null,
         };
 
-        const analysis = await analyzeContent(
-          anthropicClient,
-          item,
-          creator
-        );
+        const analysis = useLocalCli
+          ? await analyzeContentLocal(item, creator, "")
+          : await analyzeContent(anthropicClient, item, creator, "");
 
         // Update content row with analysis results
         const { error: updateError } = await supabase

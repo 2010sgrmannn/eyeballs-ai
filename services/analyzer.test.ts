@@ -43,22 +43,21 @@ const mockCreator: CreatorInfo = {
 
 describe("buildAnalysisPrompt", () => {
   it("includes platform, content type, and caption", () => {
-    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator);
+    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator, "");
     expect(prompt).toContain("tiktok");
     expect(prompt).toContain("video");
     expect(prompt).toContain("Check out this amazing fitness routine");
   });
 
   it("includes engagement data", () => {
-    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator);
+    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator, "");
     expect(prompt).toContain("50000");
     expect(prompt).toContain("5000");
     expect(prompt).toContain("100000");
   });
 
   it("includes JSON structure instructions", () => {
-    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator);
-    expect(prompt).toContain("transcript");
+    const prompt = buildAnalysisPrompt(mockContentItem, mockCreator, "");
     expect(prompt).toContain("hook_text");
     expect(prompt).toContain("cta_text");
     expect(prompt).toContain("virality_score");
@@ -76,8 +75,8 @@ describe("buildAnalysisPrompt", () => {
       share_count: null,
       engagement_ratio: null,
     };
-    const prompt = buildAnalysisPrompt(sparse, { follower_count: null });
-    expect(prompt).toContain("Analyze the following social media content");
+    const prompt = buildAnalysisPrompt(sparse, { follower_count: null }, "");
+    expect(prompt).toContain("You are a social media content analyst");
     expect(prompt).not.toContain("Platform:");
     expect(prompt).not.toContain("Views:");
   });
@@ -85,7 +84,6 @@ describe("buildAnalysisPrompt", () => {
 
 describe("parseAnalysisResponse", () => {
   const validResponse = JSON.stringify({
-    transcript: "A fitness routine video showing exercises",
     hook_text: "Check out this amazing fitness routine!",
     cta_text: "Drop a comment below.",
     virality_score: 72,
@@ -98,9 +96,11 @@ describe("parseAnalysisResponse", () => {
     ],
   });
 
+  const whisperTranscript = "A fitness routine video showing exercises";
+
   it("parses valid JSON response", () => {
-    const result = parseAnalysisResponse(validResponse);
-    expect(result.transcript).toBe("A fitness routine video showing exercises");
+    const result = parseAnalysisResponse(validResponse, whisperTranscript);
+    expect(result.transcript).toBe(whisperTranscript);
     expect(result.hook_text).toBe("Check out this amazing fitness routine!");
     expect(result.cta_text).toBe("Drop a comment below.");
     expect(result.virality_score).toBe(72);
@@ -109,82 +109,76 @@ describe("parseAnalysisResponse", () => {
 
   it("handles markdown code fences", () => {
     const wrapped = "```json\n" + validResponse + "\n```";
-    const result = parseAnalysisResponse(wrapped);
-    expect(result.transcript).toBe("A fitness routine video showing exercises");
+    const result = parseAnalysisResponse(wrapped, whisperTranscript);
+    expect(result.transcript).toBe(whisperTranscript);
     expect(result.tags).toHaveLength(5);
   });
 
   it("rounds virality score to integer", () => {
     const response = JSON.stringify({
-      transcript: "test",
       hook_text: "test",
       cta_text: "",
       virality_score: 72.6,
       tags: [],
     });
-    const result = parseAnalysisResponse(response);
+    const result = parseAnalysisResponse(response, "");
     expect(result.virality_score).toBe(73);
   });
 
   it("throws on invalid JSON", () => {
-    expect(() => parseAnalysisResponse("not json")).toThrow(
+    expect(() => parseAnalysisResponse("not json", "")).toThrow(
       "Failed to parse analysis response as JSON"
     );
   });
 
-  it("throws on missing transcript field", () => {
+  it("uses whisperTranscript param for transcript field", () => {
     const response = JSON.stringify({
       hook_text: "test",
       cta_text: "",
       virality_score: 50,
       tags: [],
     });
-    expect(() => parseAnalysisResponse(response)).toThrow(
-      "Missing or invalid 'transcript'"
-    );
+    const result = parseAnalysisResponse(response, "my transcript");
+    expect(result.transcript).toBe("my transcript");
   });
 
   it("throws on missing hook_text field", () => {
     const response = JSON.stringify({
-      transcript: "test",
       cta_text: "",
       virality_score: 50,
       tags: [],
     });
-    expect(() => parseAnalysisResponse(response)).toThrow(
+    expect(() => parseAnalysisResponse(response, "")).toThrow(
       "Missing or invalid 'hook_text'"
     );
   });
 
   it("throws on virality_score out of range", () => {
     const response = JSON.stringify({
-      transcript: "test",
       hook_text: "test",
       cta_text: "",
       virality_score: 150,
       tags: [],
     });
-    expect(() => parseAnalysisResponse(response)).toThrow(
+    expect(() => parseAnalysisResponse(response, "")).toThrow(
       "Missing or invalid 'virality_score'"
     );
   });
 
   it("throws on negative virality_score", () => {
     const response = JSON.stringify({
-      transcript: "test",
       hook_text: "test",
       cta_text: "",
       virality_score: -10,
       tags: [],
     });
-    expect(() => parseAnalysisResponse(response)).toThrow(
+    expect(() => parseAnalysisResponse(response, "")).toThrow(
       "Missing or invalid 'virality_score'"
     );
   });
 
   it("filters out tags with invalid categories", () => {
     const response = JSON.stringify({
-      transcript: "test",
       hook_text: "test",
       cta_text: "",
       virality_score: 50,
@@ -194,14 +188,14 @@ describe("parseAnalysisResponse", () => {
         { tag: "funny", category: "emotion" },
       ],
     });
-    const result = parseAnalysisResponse(response);
+    const result = parseAnalysisResponse(response, "");
     expect(result.tags).toHaveLength(2);
     expect(result.tags[0].tag).toBe("fitness");
     expect(result.tags[1].tag).toBe("funny");
   });
 
   it("throws when response is not an object", () => {
-    expect(() => parseAnalysisResponse('"just a string"')).toThrow(
+    expect(() => parseAnalysisResponse('"just a string"', "")).toThrow(
       "Analysis response is not an object"
     );
   });
@@ -279,7 +273,6 @@ describe("analyzeContent", () => {
         {
           type: "text" as const,
           text: JSON.stringify({
-            transcript: "A fitness video",
             hook_text: "Check this out!",
             cta_text: "Follow for more",
             virality_score: 80,
@@ -298,7 +291,8 @@ describe("analyzeContent", () => {
     const result = await analyzeContent(
       mockClient,
       mockContentItem,
-      mockCreator
+      mockCreator,
+      "A fitness video"
     );
     expect(result.transcript).toBe("A fitness video");
     expect(result.virality_score).toBe(80);
@@ -313,18 +307,17 @@ describe("analyzeContent", () => {
     } as unknown as import("@anthropic-ai/sdk").default;
 
     expect(
-      analyzeContent(mockClient, mockContentItem, mockCreator)
+      analyzeContent(mockClient, mockContentItem, mockCreator, "")
     ).rejects.toThrow("No text response from Claude API");
   });
 });
 
 describe("createAnthropicClient", () => {
-  it("throws when ANTHROPIC_API_KEY is not set", () => {
+  it("returns null when ANTHROPIC_API_KEY is not set", () => {
     const original = process.env.ANTHROPIC_API_KEY;
     delete process.env.ANTHROPIC_API_KEY;
-    expect(() => createAnthropicClient()).toThrow(
-      "ANTHROPIC_API_KEY environment variable is required"
-    );
+    const client = createAnthropicClient();
+    expect(client).toBeNull();
     if (original) process.env.ANTHROPIC_API_KEY = original;
   });
 
@@ -332,6 +325,7 @@ describe("createAnthropicClient", () => {
     process.env.ANTHROPIC_API_KEY = "test-key-123";
     const client = createAnthropicClient();
     expect(client).toBeDefined();
+    expect(client).not.toBeNull();
     delete process.env.ANTHROPIC_API_KEY;
   });
 });

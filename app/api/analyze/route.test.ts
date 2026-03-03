@@ -74,6 +74,17 @@ mock.module("@/lib/supabase/server", () => ({
 // Mock analyzer module
 let shouldThrowOnCreateClient = false;
 
+const mockAnalysisResult = {
+  transcript: "A fitness video about workout routines",
+  hook_text: "Amazing hook!",
+  cta_text: "Follow for more.",
+  virality_score: 75,
+  tags: [
+    { tag: "fitness", category: "niche" },
+    { tag: "workout", category: "topic" },
+  ],
+};
+
 mock.module("@/services/analyzer", () => ({
   createAnthropicClient: () => {
     if (shouldThrowOnCreateClient) {
@@ -81,17 +92,8 @@ mock.module("@/services/analyzer", () => ({
     }
     return { messages: { create: mock(() => ({})) } };
   },
-  analyzeContent: () =>
-    Promise.resolve({
-      transcript: "A fitness video about workout routines",
-      hook_text: "Amazing hook!",
-      cta_text: "Follow for more.",
-      virality_score: 75,
-      tags: [
-        { tag: "fitness", category: "niche" },
-        { tag: "workout", category: "topic" },
-      ],
-    }),
+  analyzeContent: () => Promise.resolve(mockAnalysisResult),
+  analyzeContentLocal: () => Promise.resolve(mockAnalysisResult),
   analyzeContentBatch: async (
     items: unknown[],
     fn: (item: unknown) => Promise<unknown>
