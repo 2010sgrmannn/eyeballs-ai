@@ -200,7 +200,11 @@ export function CanvasBuilder({
       const canvas = await store.createCanvas(brief.topic || "New Canvas", brief as unknown as Record<string, unknown>);
       if (!canvas) return;
 
-      // Auto-build
+      // Set as active immediately so the ReactFlow viewport renders
+      store.setActiveCanvas(canvas.id);
+      useCanvasStore.setState({ activeCanvasId: canvas.id });
+
+      // Auto-build and load result directly into the store
       try {
         const res = await fetch("/api/canvas/auto-build", {
           method: "POST",
@@ -209,15 +213,44 @@ export function CanvasBuilder({
         });
 
         if (res.ok) {
-          // Navigate to the new canvas
-          router.push(`/dashboard/canvas?canvas=${canvas.id}`);
+          const { nodes: dbNodes, edges: dbEdges } = await res.json();
+
+          // Enrich nodes with brand/folder/product data before loading
+          const enrichedNodes = (dbNodes ?? []).map((n: CanvasNode) => {
+            if (n.node_type === "backstory" && brandProfile) {
+              return {
+                ...n,
+                data: {
+                  ...n.data,
+                  personal_bio: brandProfile.personal_bio,
+                  biggest_struggle: brandProfile.biggest_struggle,
+                  defining_moment: brandProfile.defining_moment,
+                  fun_facts: brandProfile.fun_facts,
+                  display_name: brandProfile.display_name,
+                },
+              };
+            }
+            if (n.node_type === "content_folder") {
+              return { ...n, data: { ...n.data, availableFolders: folders } };
+            }
+            if (n.node_type === "product") {
+              return { ...n, data: { ...n.data, availableProducts: products } };
+            }
+            return n;
+          });
+
+          store.loadCanvas(enrichedNodes, dbEdges ?? []);
+
+          // Update URL without full page reload
+          window.history.replaceState(null, "", `/dashboard/canvas?canvas=${canvas.id}`);
         }
-      } catch {
-        // Still navigate even if auto-build fails
-        router.push(`/dashboard/canvas?canvas=${canvas.id}`);
+      } catch (err) {
+        console.error("Auto-build failed:", err);
+        // Canvas was created but empty — update URL so refresh loads it
+        window.history.replaceState(null, "", `/dashboard/canvas?canvas=${canvas.id}`);
       }
     },
-    [router]
+    [brandProfile, folders, products]
   );
 
   return (
