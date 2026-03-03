@@ -59,11 +59,36 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
   }
 
-  const { data, error } = await supabase
+  // Check if profile exists
+  const { data: existing } = await supabase
     .from("brand_profiles")
-    .upsert({ user_id: user.id, ...updates }, { onConflict: "user_id" })
-    .select()
+    .select("id")
+    .eq("user_id", user.id)
     .single();
+
+  let data;
+  let error;
+
+  if (existing) {
+    // Update existing row
+    const result = await supabase
+      .from("brand_profiles")
+      .update(updates)
+      .eq("user_id", user.id)
+      .select()
+      .single();
+    data = result.data;
+    error = result.error;
+  } else {
+    // Insert new row
+    const result = await supabase
+      .from("brand_profiles")
+      .insert({ user_id: user.id, ...updates })
+      .select()
+      .single();
+    data = result.data;
+    error = result.error;
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
