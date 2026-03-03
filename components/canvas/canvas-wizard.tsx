@@ -68,6 +68,7 @@ export function CanvasWizard({
   const [messages, setMessages] = useState<WizardMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isBuilding, setIsBuilding] = useState(false);
   const [brief, setBrief] = useState<Partial<CanvasBrief> | null>(null);
 
   // Context selection state
@@ -150,25 +151,39 @@ export function CanvasWizard({
     }
   };
 
-  const handleBuildClick = () => {
-    if (brief) {
-      setStep(3);
-    }
-  };
-
-  const handleFinalBuild = () => {
+  const buildCanvas = (
+    folderIds: string[] = [],
+    productIds: string[] = [],
+    storyIds: string[] = [],
+  ) => {
     if (!brief) return;
+    setIsBuilding(true);
     const finalBrief: CanvasBrief = {
       topic: brief.topic || topic,
       emotion: brief.emotion || "",
       angle: brief.angle || "",
       targetAudience: brief.targetAudience || "",
-      selectedFolderIds,
-      selectedProductIds,
-      selectedStoryIds,
+      selectedFolderIds: folderIds,
+      selectedProductIds: productIds,
+      selectedStoryIds: storyIds,
       conversationHistory: messages,
     };
     onComplete(finalBrief);
+  };
+
+  const handleBuildClick = () => {
+    if (!brief) return;
+    // Skip context selection if there's nothing to select
+    const hasContext = folders.length > 0 || products.length > 0 || stories.length > 0;
+    if (hasContext) {
+      setStep(3);
+    } else {
+      buildCanvas();
+    }
+  };
+
+  const handleFinalBuild = () => {
+    buildCanvas(selectedFolderIds, selectedProductIds, selectedStoryIds);
   };
 
   const toggleSelection = (id: string, list: string[], setter: (ids: string[]) => void) => {
@@ -320,9 +335,10 @@ export function CanvasWizard({
               <div className="mx-4 mb-2">
                 <button
                   onClick={handleBuildClick}
-                  className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                  disabled={isBuilding}
+                  className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
-                  Looks good, let&apos;s build &rarr;
+                  {isBuilding ? "Building..." : "Looks good, let\u2019s build \u2192"}
                 </button>
               </div>
             )}
@@ -483,9 +499,10 @@ export function CanvasWizard({
             <div className="px-6 pb-6 pt-2">
               <button
                 onClick={handleFinalBuild}
-                className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                disabled={isBuilding}
+                className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                Build Canvas
+                {isBuilding ? "Building..." : "Build Canvas"}
               </button>
             </div>
           </motion.div>

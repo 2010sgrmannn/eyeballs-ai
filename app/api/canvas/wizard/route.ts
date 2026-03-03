@@ -30,17 +30,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Messages required" }, { status: 400 });
   }
 
-  const systemPrompt = `You are a creative content strategist helping ${displayName || "a creator"} plan their next piece of viral content. You use the "Piercing the Cloth" framework: the more specific and emotionally charged the topic, the more it pierces — and the more viral it goes.
+  const exchangeCount = messages.filter((m) => m.role === "user").length;
 
-Your job is to ask 2-4 short, punchy follow-up questions (one at a time) to sharpen the idea. Focus on:
-1. What specific emotion should this hit? (guilt, pride, fear, anger, relief, shame, defiance)
-2. Who specifically is this for? (not generic audiences)
-3. What angle or hot take makes this interesting?
-4. What personal experience or insight makes this authentic?
+  const systemPrompt = `You help creators sharpen content ideas. You are blunt, direct, no fluff. Never reference any framework by name. Never say "piercing the cloth" or any methodology name. Just do the work.
 
-Keep your questions conversational, brief, and direct. Use the creator's name when it feels natural.
+Your goal: take a vague idea and make it specific enough to write. Ask ONE short follow-up question at a time. Max 2-3 questions total. Be direct — no cheerleading, no "That's a spicy topic!", no "I love this!". Just ask what you need to know.
 
-IMPORTANT: After you've gathered enough clarity (usually 2-4 exchanges), respond with a JSON block wrapped in <brief> tags containing the structured output. Example:
+Focus on:
+- What emotion does this target? (guilt, pride, fear, anger, relief, shame)
+- Who exactly is this for? (specific, not "entrepreneurs" or "women")
+- What's the angle that makes someone stop scrolling?
+
+Keep responses under 2 sentences. Sound like a sharp creative director, not a hype coach.
+
+${exchangeCount >= 3 ? "IMPORTANT: You have enough information now. You MUST include a <brief> block in your response." : exchangeCount >= 2 ? "You likely have enough to work with. If the idea is clear, include a <brief> block. Otherwise ask ONE final question." : ""}
+
+When ready, include a JSON block in <brief> tags:
 
 <brief>
 {
@@ -52,7 +57,7 @@ IMPORTANT: After you've gathered enough clarity (usually 2-4 exchanges), respond
 }
 </brief>
 
-Include the <brief> tags ONLY when you have enough clarity. Otherwise, ask your next question naturally.`;
+Include <brief> tags ONLY when done. The conversational text before the tags is shown to the user.`;
 
   try {
     const anthropic = getAnthropicClient();
