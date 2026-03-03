@@ -59,40 +59,35 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
   }
 
-  // Check if profile exists
-  const { data: existing } = await supabase
+  // Try update first (most common case — profile exists from onboarding)
+  const { data: updated, error: updateError } = await supabase
     .from("brand_profiles")
-    .select("id")
+    .update({ ...updates, updated_at: new Date().toISOString() })
     .eq("user_id", user.id)
+    .select()
+    .maybeSingle();
+
+  if (updateError) {
+    console.error("brand-profile UPDATE failed:", updateError);
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  // If update returned a row, we're done
+  if (updated) {
+    return NextResponse.json(updated);
+  }
+
+  // No row existed — insert a new one
+  const { data: inserted, error: insertError } = await supabase
+    .from("brand_profiles")
+    .insert({ user_id: user.id, ...updates })
+    .select()
     .single();
 
-  let data;
-  let error;
-
-  if (existing) {
-    // Update existing row
-    const result = await supabase
-      .from("brand_profiles")
-      .update(updates)
-      .eq("user_id", user.id)
-      .select()
-      .single();
-    data = result.data;
-    error = result.error;
-  } else {
-    // Insert new row
-    const result = await supabase
-      .from("brand_profiles")
-      .insert({ user_id: user.id, ...updates })
-      .select()
-      .single();
-    data = result.data;
-    error = result.error;
+  if (insertError) {
+    console.error("brand-profile INSERT failed:", insertError);
+    return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json(data);
+  return NextResponse.json(inserted);
 }
