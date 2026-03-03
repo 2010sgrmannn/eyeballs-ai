@@ -14,11 +14,21 @@ interface WizardProps {
   folders: { id: string; name: string }[];
   products: { id: string; name: string; type: string; description: string | null; price: string | null; url: string | null }[];
   stories: { id: string; title: string; emotion: string | null; category: string | null }[];
+  brandProfile: {
+    personal_bio: string | null;
+    biggest_struggle: string | null;
+    defining_moment: string | null;
+    fun_facts: string[] | null;
+    display_name: string | null;
+    birth_year: number | null;
+    location: string | null;
+    content_pillars?: string[] | null;
+    target_audience?: string | null;
+    niche?: string | null;
+  } | null;
   onComplete: (brief: CanvasBrief) => void;
   onClose: () => void;
 }
-
-const EMOTION_CHIPS = ["guilt", "pride", "fear", "anger", "relief", "shame"];
 
 // Inline SVG icons
 function IconSend() {
@@ -60,6 +70,7 @@ export function CanvasWizard({
   folders,
   products,
   stories,
+  brandProfile,
   onComplete,
   onClose,
 }: WizardProps) {
@@ -70,6 +81,7 @@ export function CanvasWizard({
   const [isLoading, setIsLoading] = useState(false);
   const [isBuilding, setIsBuilding] = useState(false);
   const [brief, setBrief] = useState<Partial<CanvasBrief> | null>(null);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
 
   // Context selection state
   const [selectedFolderIds, setSelectedFolderIds] = useState<string[]>([]);
@@ -79,34 +91,59 @@ export function CanvasWizard({
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Build user context payload for the API
+  const userContext = {
+    brandProfile: brandProfile
+      ? {
+          personal_bio: brandProfile.personal_bio,
+          biggest_struggle: brandProfile.biggest_struggle,
+          defining_moment: brandProfile.defining_moment,
+          content_pillars: brandProfile.content_pillars,
+          target_audience: brandProfile.target_audience,
+          niche: brandProfile.niche,
+        }
+      : undefined,
+    stories: stories.map((s) => ({ title: s.title, emotion: s.emotion, category: s.category })),
+    products: products.map((p) => ({ name: p.name, type: p.type, description: p.description })),
+    folders: folders.map((f) => ({ name: f.name })),
+  };
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, currentOptions]);
 
   useEffect(() => {
     if (step === 2) inputRef.current?.focus();
   }, [step]);
 
+  const callWizardAPI = async (msgs: WizardMessage[]) => {
+    const res = await fetch("/api/canvas/wizard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: msgs, displayName, userContext }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  };
+
   const handleStep1Submit = async () => {
     if (!topic.trim()) return;
     setStep(2);
     setIsLoading(true);
+    setCurrentOptions([]);
 
     const userMsg: WizardMessage = { role: "user", content: topic.trim() };
     setMessages([userMsg]);
 
     try {
-      const res = await fetch("/api/canvas/wizard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [userMsg], displayName }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
+      const data = await callWizardAPI([userMsg]);
       setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
       if (data.ready && data.brief) {
         setBrief(data.brief);
+        setCurrentOptions([]);
+      } else if (data.options) {
+        setCurrentOptions(data.options);
       }
     } catch {
       setMessages((prev) => [
@@ -127,19 +164,16 @@ export function CanvasWizard({
     setMessages(updatedMessages);
     setInputValue("");
     setIsLoading(true);
+    setCurrentOptions([]);
 
     try {
-      const res = await fetch("/api/canvas/wizard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages, displayName }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
+      const data = await callWizardAPI(updatedMessages);
       setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
       if (data.ready && data.brief) {
         setBrief(data.brief);
+        setCurrentOptions([]);
+      } else if (data.options) {
+        setCurrentOptions(data.options);
       }
     } catch {
       setMessages((prev) => [
@@ -173,7 +207,6 @@ export function CanvasWizard({
 
   const handleBuildClick = () => {
     if (!brief) return;
-    // Skip context selection if there's nothing to select
     const hasContext = folders.length > 0 || products.length > 0 || stories.length > 0;
     if (hasContext) {
       setStep(3);
@@ -210,7 +243,7 @@ export function CanvasWizard({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative z-10 w-full max-w-lg rounded-2xl p-8"
+            className="relative z-10 w-full max-w-2xl rounded-2xl p-10"
             style={{
               background: "rgba(15, 25, 35, 0.95)",
               backdropFilter: "blur(24px)",
@@ -219,17 +252,17 @@ export function CanvasWizard({
           >
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
+              className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
             >
               <span className="text-[#6B6B6B]"><IconX /></span>
             </button>
 
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#6366F1]/10">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#6366F1]/10">
                 <span className="text-[#6366F1]"><IconSparkles /></span>
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-[#FAFAFA]">
+                <h2 className="text-xl font-semibold text-[#FAFAFA]">
                   Hey {displayName || "there"}, what are we working on today?
                 </h2>
                 <p className="text-sm text-[#6B6B6B]">Describe your content idea</p>
@@ -243,7 +276,7 @@ export function CanvasWizard({
                 onChange={(e) => setTopic(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleStep1Submit()}
                 placeholder="e.g. Why hustle culture is making you broke..."
-                className="flex-1 rounded-xl px-4 py-3 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none"
+                className="flex-1 rounded-xl px-4 py-3.5 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none"
                 style={{
                   background: "rgba(255, 255, 255, 0.04)",
                   border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -252,7 +285,7 @@ export function CanvasWizard({
               <button
                 onClick={handleStep1Submit}
                 disabled={!topic.trim()}
-                className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
+                className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
               >
                 <IconSend />
               </button>
@@ -268,16 +301,16 @@ export function CanvasWizard({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative z-10 flex w-full max-w-lg flex-col rounded-2xl"
+            className="relative z-10 flex w-full max-w-2xl flex-col rounded-2xl"
             style={{
               background: "rgba(15, 25, 35, 0.95)",
               backdropFilter: "blur(24px)",
               border: "1px solid rgba(255, 255, 255, 0.08)",
-              maxHeight: "70vh",
+              maxHeight: "85vh",
             }}
           >
             {/* Chat header */}
-            <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center justify-between px-7 py-5">
               <div className="flex items-center gap-2">
                 <span className="text-[#6366F1]"><IconSparkles /></span>
                 <span className="text-sm font-medium text-[#FAFAFA]">Sharpening your idea</span>
@@ -290,17 +323,17 @@ export function CanvasWizard({
               </button>
             </div>
 
-            <div className="mx-4 h-px bg-white/[0.06]" />
+            <div className="mx-5 h-px bg-white/[0.06]" />
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-7 py-5 space-y-4">
               {messages.map((msg, i) => (
                 <div
                   key={i}
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className="max-w-[85%] rounded-xl px-4 py-2.5 text-sm"
+                    className="max-w-[85%] rounded-xl px-4 py-3 text-sm leading-relaxed"
                     style={{
                       background:
                         msg.role === "user"
@@ -332,49 +365,49 @@ export function CanvasWizard({
 
             {/* Brief ready action */}
             {brief && (
-              <div className="mx-4 mb-2">
+              <div className="mx-5 mb-3">
                 <button
                   onClick={handleBuildClick}
                   disabled={isBuilding}
-                  className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="w-full rounded-xl bg-[#6366F1] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {isBuilding ? "Building..." : "Looks good, let\u2019s build \u2192"}
                 </button>
               </div>
             )}
 
-            {/* Emotion chips */}
-            {!brief && messages.length > 0 && messages.length < 4 && (
-              <div className="flex flex-wrap gap-1.5 px-6 pb-2">
-                {EMOTION_CHIPS.map((emotion) => (
+            {/* AI-generated options */}
+            {!brief && !isLoading && currentOptions.length > 0 && (
+              <div className="px-7 pb-2 space-y-1.5">
+                {currentOptions.map((option, i) => (
                   <button
-                    key={emotion}
-                    onClick={() => sendMessage(emotion)}
-                    className="rounded-full px-3 py-1 text-xs capitalize transition-colors hover:bg-white/10"
+                    key={i}
+                    onClick={() => sendMessage(option)}
+                    className="w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/[0.08]"
                     style={{
-                      background: "rgba(255, 255, 255, 0.04)",
+                      background: "rgba(255, 255, 255, 0.03)",
                       border: "1px solid rgba(255, 255, 255, 0.08)",
-                      color: "#A1A1A1",
+                      color: "#FAFAFA",
                     }}
                   >
-                    {emotion}
+                    {option}
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Input */}
+            {/* Manual input — always visible when no brief */}
             {!brief && (
-              <div className="px-4 pb-4 pt-2">
+              <div className="px-5 pb-5 pt-2">
                 <div className="flex gap-2">
                   <input
                     ref={inputRef}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    placeholder="Type your response..."
+                    placeholder="Or type something else..."
                     disabled={isLoading}
-                    className="flex-1 rounded-xl px-4 py-2.5 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none disabled:opacity-50"
+                    className="flex-1 rounded-xl px-4 py-3 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none disabled:opacity-50"
                     style={{
                       background: "rgba(255, 255, 255, 0.04)",
                       border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -383,7 +416,7 @@ export function CanvasWizard({
                   <button
                     onClick={() => sendMessage()}
                     disabled={!inputValue.trim() || isLoading}
-                    className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
+                    className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
                   >
                     <IconSend />
                   </button>
@@ -401,18 +434,18 @@ export function CanvasWizard({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative z-10 w-full max-w-lg rounded-2xl"
+            className="relative z-10 w-full max-w-2xl rounded-2xl"
             style={{
               background: "rgba(15, 25, 35, 0.95)",
               backdropFilter: "blur(24px)",
               border: "1px solid rgba(255, 255, 255, 0.08)",
-              maxHeight: "70vh",
+              maxHeight: "85vh",
             }}
           >
-            <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center justify-between px-7 py-5">
               <div>
-                <h3 className="text-sm font-medium text-[#FAFAFA]">Select context</h3>
-                <p className="text-xs text-[#6B6B6B]">Choose what to connect to your canvas</p>
+                <h3 className="text-base font-medium text-[#FAFAFA]">Select context</h3>
+                <p className="text-sm text-[#6B6B6B]">Choose what to connect to your canvas</p>
               </div>
               <button
                 onClick={onClose}
@@ -422,9 +455,9 @@ export function CanvasWizard({
               </button>
             </div>
 
-            <div className="mx-4 h-px bg-white/[0.06]" />
+            <div className="mx-5 h-px bg-white/[0.06]" />
 
-            <div className="max-h-[45vh] overflow-y-auto px-6 py-4 space-y-5">
+            <div className="max-h-[55vh] overflow-y-auto px-7 py-5 space-y-5">
               {/* Folders */}
               {folders.length > 0 && (
                 <div>
@@ -488,19 +521,13 @@ export function CanvasWizard({
                   </div>
                 </div>
               )}
-
-              {folders.length === 0 && products.length === 0 && stories.length === 0 && (
-                <p className="text-center text-sm text-[#6B6B6B] py-4">
-                  No context available yet. You can add folders, products, and stories later.
-                </p>
-              )}
             </div>
 
-            <div className="px-6 pb-6 pt-2">
+            <div className="px-7 pb-7 pt-3">
               <button
                 onClick={handleFinalBuild}
                 disabled={isBuilding}
-                className="w-full rounded-xl bg-[#6366F1] px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="w-full rounded-xl bg-[#6366F1] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               >
                 {isBuilding ? "Building..." : "Build Canvas"}
               </button>
@@ -526,7 +553,7 @@ function CheckboxItem({
   return (
     <button
       onClick={onChange}
-      className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/5"
+      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/5"
     >
       <div
         className="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"

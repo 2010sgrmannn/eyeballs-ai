@@ -33,7 +33,7 @@ export default async function CanvasPage({ searchParams }: PageProps) {
       .order("updated_at", { ascending: false }),
     supabase
       .from("brand_profiles")
-      .select("personal_bio, biggest_struggle, defining_moment, fun_facts, display_name, birth_year, location")
+      .select("personal_bio, biggest_struggle, defining_moment, fun_facts, display_name, birth_year, location, content_pillars, target_audience, niche")
       .eq("user_id", user.id)
       .single(),
     supabase

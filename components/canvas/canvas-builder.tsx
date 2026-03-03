@@ -40,6 +40,9 @@ interface CanvasBuilderProps {
     display_name: string | null;
     birth_year: number | null;
     location: string | null;
+    content_pillars?: string[] | null;
+    target_audience?: string | null;
+    niche?: string | null;
   } | null;
   folders: { id: string; name: string }[];
   products: { id: string; name: string; type: string; description: string | null; price: string | null; url: string | null }[];
@@ -269,6 +272,7 @@ export function CanvasBuilder({
             folders={folders}
             products={products}
             stories={stories}
+            brandProfile={brandProfile}
             onComplete={handleWizardComplete}
             onClose={() => setShowWizard(false)}
           />
