@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { BrandProfile, Product, ProductType, CreatorStory, StoryEmotion, StoryCategory } from "@/types/database";
 
 // ---------------------------------------------------------------------------
@@ -127,10 +127,19 @@ function InlineField({
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
+  const committedRef = useRef(false);
+
+  // Sync draft when parent value changes (e.g. after API save)
+  useEffect(() => {
+    if (!editing) setDraft(value);
+  }, [value, editing]);
 
   function commit() {
+    if (committedRef.current) return; // prevent double-fire from Enter + blur
+    committedRef.current = true;
     setEditing(false);
     if (draft !== value) onSave(draft);
+    setTimeout(() => { committedRef.current = false; }, 0);
   }
 
   if (editing) {
@@ -314,16 +323,29 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
   // ---------------------------------------------------------------------------
 
   const updateProfile = useCallback(async (fields: Record<string, unknown>) => {
-    const res = await fetch("/api/brand-profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(fields),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setProfile(updated);
+    // Optimistic update — apply immediately so the UI doesn't flash back
+    setProfile((prev) => prev ? { ...prev, ...fields } as BrandProfile : { user_id: "", id: "", created_at: "", updated_at: "", ...fields } as unknown as BrandProfile);
+
+    try {
+      const res = await fetch("/api/brand-profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setProfile(updated);
+      } else {
+        // Revert on failure
+        const errBody = await res.json().catch(() => ({}));
+        console.error("Profile save failed:", res.status, errBody);
+        setProfile(initialProfile);
+      }
+    } catch (err) {
+      console.error("Profile save error:", err);
+      setProfile(initialProfile);
     }
-  }, []);
+  }, [initialProfile]);
 
   // ---------------------------------------------------------------------------
   // Story CRUD
