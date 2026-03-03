@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import type { NodeProps } from "@xyflow/react";
+import type { NodeProps, Node } from "@xyflow/react";
 import { useCanvasStore } from "@/lib/stores/canvas-store";
 import { colors } from "@/lib/design-tokens";
 import type { CanvasNodeData } from "@/lib/stores/canvas-store";
@@ -20,7 +20,7 @@ interface Message {
   content: string;
 }
 
-export function AiChatNode({ id, data }: NodeProps<CanvasNodeData>) {
+export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
   const removeNode = useCanvasStore((s) => s.removeNode);
   const updateNodeData = useCanvasStore((s) => s.updateNodeData);
   const { getEdges, getNodes } = useReactFlow();

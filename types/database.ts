@@ -45,6 +45,34 @@ export interface BrandProfile {
   target_audience: string | null;
   content_style: string | null;
   niche: string | null;
+  display_name: string | null;
+  creator_type: string | null;
+  primary_platform: string | null;
+  social_handles: Record<string, string> | null;
+  inspiration_handles: string[] | null;
+  tone_descriptors: string[] | null;
+  tone_formality: number | null;
+  tone_humor: number | null;
+  tone_authority: number | null;
+  creator_archetype: string | null;
+  sample_content: string | null;
+  content_pillars: string[] | null;
+  content_goal: string | null;
+  content_formats: string[] | null;
+  preferred_cta: string[] | null;
+  unique_value_prop: string | null;
+  audience_problem: string | null;
+  audience_age_ranges: string[] | null;
+  audience_gender: string | null;
+  birth_year: number | null;
+  location: string | null;
+  personal_bio: string | null;
+  fun_facts: string[] | null;
+  languages: string[] | null;
+  early_life: string | null;
+  biggest_struggle: string | null;
+  defining_moment: string | null;
+  onboarding_completed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -68,8 +96,30 @@ export interface Content {
   virality_score: number | null;
   hook_text: string | null;
   cta_text: string | null;
+  carousel_urls: string[] | null;
   posted_at: string | null;
   analyzed_at: string | null;
+  created_at: string;
+}
+
+export interface Favorite {
+  id: string;
+  user_id: string;
+  content_id: string;
+  created_at: string;
+}
+
+export interface Folder {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface FolderItem {
+  id: string;
+  folder_id: string;
+  content_id: string;
   created_at: string;
 }
 
@@ -78,6 +128,36 @@ export interface ContentTag {
   content_id: string;
   tag: string;
   category: TagCategory | null;
+}
+
+export type StoryEmotion = "shame" | "pride" | "fear" | "relief" | "anger" | "joy" | "surprise" | "frustration";
+export type StoryCategory = "struggle" | "achievement" | "childhood" | "relationship" | "career" | "turning_point" | "funny" | "lesson";
+
+export interface CreatorStory {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  emotion: StoryEmotion | null;
+  category: StoryCategory | null;
+  time_period: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ProductType = "product" | "guide" | "freebie" | "course" | "coaching" | "service" | "other";
+
+export interface Product {
+  id: string;
+  user_id: string;
+  name: string;
+  type: ProductType;
+  description: string | null;
+  price: string | null;
+  url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Niche {
@@ -106,6 +186,8 @@ export interface LibraryFilters {
   dateFrom: string;
   dateTo: string;
   creatorIds: string[];
+  favoritesOnly: boolean;
+  folderId: string;
 }
 
 export type SortField =
@@ -132,6 +214,8 @@ export const DEFAULT_FILTERS: LibraryFilters = {
   dateFrom: "",
   dateTo: "",
   creatorIds: [],
+  favoritesOnly: false,
+  folderId: "",
 };
 
 export const SORT_FIELD_LABELS: Record<SortField, string> = {
@@ -152,3 +236,52 @@ export const GROUP_BY_LABELS: Record<GroupByField | "none", string> = {
 };
 
 export const ITEMS_PER_PAGE = 20;
+
+// Canvas types
+export type CanvasNodeType = "backstory" | "content_folder" | "product" | "youtube" | "ai_chat";
+
+export interface CanvasBrief {
+  topic: string;
+  emotion: string;
+  angle: string;
+  targetAudience: string;
+  selectedFolderIds: string[];
+  selectedProductIds: string[];
+  selectedStoryIds: string[];
+  conversationHistory: { role: "user" | "assistant"; content: string }[];
+}
+
+export interface Canvas {
+  id: string;
+  user_id: string;
+  name: string;
+  brief: CanvasBrief | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CanvasNode {
+  id: string;
+  user_id: string;
+  canvas_id: string;
+  node_type: CanvasNodeType;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  data: Record<string, unknown>;
+  label: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CanvasEdge {
+  id: string;
+  user_id: string;
+  canvas_id: string;
+  source_node_id: string;
+  target_node_id: string;
+  edge_type: string;
+  animated: boolean;
+  created_at: string;
+}
