@@ -210,6 +210,151 @@ function InlineField({
 }
 
 // ---------------------------------------------------------------------------
+// Location Field with autocomplete
+// ---------------------------------------------------------------------------
+
+const POPULAR_LOCATIONS = [
+  "New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ",
+  "Philadelphia, PA", "San Antonio, TX", "San Diego, CA", "Dallas, TX", "Austin, TX",
+  "San Jose, CA", "San Francisco, CA", "Seattle, WA", "Denver, CO", "Nashville, TN",
+  "Portland, OR", "Miami, FL", "Atlanta, GA", "Boston, MA", "Charlotte, NC",
+  "Minneapolis, MN", "Detroit, MI", "Las Vegas, NV", "Orlando, FL", "Tampa, FL",
+  "Salt Lake City, UT", "Raleigh, NC", "Scottsdale, AZ", "Brooklyn, NY",
+  "London, UK", "Toronto, Canada", "Vancouver, Canada", "Sydney, Australia",
+  "Melbourne, Australia", "Berlin, Germany", "Paris, France", "Amsterdam, Netherlands",
+  "Dublin, Ireland", "Barcelona, Spain", "Lisbon, Portugal", "Dubai, UAE",
+  "Singapore", "Tokyo, Japan", "Seoul, South Korea", "Mumbai, India",
+  "São Paulo, Brazil", "Mexico City, Mexico", "Buenos Aires, Argentina",
+  "Lagos, Nigeria", "Cape Town, South Africa", "Stockholm, Sweden",
+];
+
+function LocationField({
+  value,
+  onSave,
+}: {
+  value: string;
+  onSave: (v: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const committedRef = useRef(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!editing) setDraft(value);
+  }, [value, editing]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!editing) return;
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        commit();
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  });
+
+  const filtered = draft.trim().length > 0
+    ? POPULAR_LOCATIONS.filter((loc) => loc.toLowerCase().includes(draft.toLowerCase())).slice(0, 6)
+    : POPULAR_LOCATIONS.slice(0, 6);
+
+  function commit() {
+    if (committedRef.current) return;
+    committedRef.current = true;
+    setEditing(false);
+    setShowDropdown(false);
+    if (draft !== value) onSave(draft);
+    setTimeout(() => { committedRef.current = false; }, 0);
+  }
+
+  function selectLocation(loc: string) {
+    setDraft(loc);
+    committedRef.current = true;
+    setEditing(false);
+    setShowDropdown(false);
+    if (loc !== value) onSave(loc);
+    setTimeout(() => { committedRef.current = false; }, 0);
+  }
+
+  if (editing) {
+    return (
+      <div className="space-y-1 relative" ref={wrapperRef}>
+        <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+          Location
+        </label>
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => { setDraft(e.target.value); setShowDropdown(true); }}
+          onFocus={() => setShowDropdown(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            if (e.key === "Escape") { setDraft(value); setEditing(false); setShowDropdown(false); }
+          }}
+          autoFocus
+          placeholder="e.g. Austin, TX"
+          className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+          style={{
+            background: "var(--color-background)",
+            border: "1px solid var(--color-border-default)",
+            color: "#FAFAFA",
+            fontFamily: "var(--font-body)",
+            fontSize: "14px",
+          }}
+        />
+        {showDropdown && filtered.length > 0 && (
+          <div
+            className="absolute left-0 right-0 z-50 mt-1 rounded-lg overflow-hidden"
+            style={{
+              background: "var(--color-surface-elevated, #1a2332)",
+              border: "1px solid var(--color-border-default)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+            }}
+          >
+            {filtered.map((loc) => (
+              <button
+                key={loc}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => selectLocation(loc)}
+                className="w-full text-left px-3 py-2 text-sm transition-colors"
+                style={{ color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+              >
+                {loc}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="group cursor-pointer rounded-lg px-3 py-2 -mx-3 transition-all duration-200"
+      onClick={() => { setDraft(value); setEditing(true); }}
+      style={{ background: "transparent" }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-surface)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+    >
+      <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+        Location
+      </span>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: value ? "#FAFAFA" : "#555", marginTop: "2px" }}>
+        {value || "e.g. Austin, TX"}
+      </p>
+      <span className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#555" }}>
+        Click to edit
+      </span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Tag Editor (for fun_facts, languages)
 // ---------------------------------------------------------------------------
 
@@ -523,11 +668,9 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               type="number"
               placeholder="e.g. 1995"
             />
-            <InlineField
-              label="Location"
+            <LocationField
               value={profile?.location ?? ""}
               onSave={(v) => updateProfile({ location: v || null })}
-              placeholder="e.g. Austin, TX"
             />
           </div>
           <div className="mt-3">
