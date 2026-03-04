@@ -511,8 +511,8 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
 
         const parsed = JSON.parse(saved);
 
-        // If cached data belongs to a different user, discard it
-        if (parsed.userId && parsed.userId !== currentUser.id) {
+        // Discard if cached data has no userId (legacy) or belongs to a different user
+        if (!parsed.userId || parsed.userId !== currentUser.id) {
           localStorage.removeItem(STORAGE_KEY);
           return;
         }
