@@ -492,38 +492,57 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     };
   }, []);
 
-  // Persist progress to localStorage (onboarding only)
+  // Persist progress to localStorage (onboarding only).
+  // We store the user_id alongside the form data so that if a different user
+  // signs in (or the same email re-signs up after account deletion), stale
+  // cached data from a previous session is discarded automatically.
   const STORAGE_KEY = "eyeballs_onboarding_progress";
 
   useEffect(() => {
     if (mode !== "onboarding") return;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
+
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user: currentUser } }) => {
+      if (!currentUser) return;
+
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+
         const parsed = JSON.parse(saved);
+
+        // If cached data belongs to a different user, discard it
+        if (parsed.userId && parsed.userId !== currentUser.id) {
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+
         if (parsed.formData) setFormData((prev) => ({ ...prev, ...parsed.formData }));
         if (parsed.stories?.length) setStories(parsed.stories);
         if (typeof parsed.stepIndex === "number" && parsed.stepIndex > 0) {
           const safeIdx = Math.min(parsed.stepIndex, totalSteps - 1);
           setStepIndex(safeIdx);
         }
+      } catch {
+        // ignore parse errors
       }
-    } catch {
-      // ignore parse errors
-    }
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (mode !== "onboarding") return;
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ formData, stories, stepIndex })
-      );
-    } catch {
-      // ignore quota errors
-    }
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user: currentUser } }) => {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ userId: currentUser?.id, formData, stories, stepIndex })
+        );
+      } catch {
+        // ignore quota errors
+      }
+    });
   }, [formData, stories, stepIndex, mode]);
 
   // Step transition helper
