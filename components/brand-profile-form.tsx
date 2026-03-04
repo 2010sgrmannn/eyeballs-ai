@@ -37,7 +37,7 @@ interface BrandProfileFormProps {
   mode: "onboarding" | "edit";
 }
 
-type AnalyzingPhase = "idle" | "scraping" | "analyzing" | "done" | "error";
+type AnalyzingPhase = "idle" | "scraping" | "transcribing" | "classifying" | "analyzing_dna" | "done" | "error";
 
 const STORY_CATEGORIES: { value: StoryCategory; label: string }[] = [
   { value: "struggle", label: "Struggle" },
@@ -447,9 +447,10 @@ function SpinnerIcon({ size = 18, color = "#00D4D4" }: { size?: number; color?: 
 export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   const router = useRouter();
 
-  // In edit mode, show steps 0 (about you), 1 (story), 4 (brand DNA). Map to indices.
-  const editSteps = [0, 1, 4];
-  const onboardingSteps = [0, 1, 2, 3, 4, 5];
+  // Step mapping: 0=Instagram, 1=About You, 2=Your Story, 3=Brand DNA, 4=Launch
+  // In edit mode: About You, Story, Brand DNA only
+  const editSteps = [1, 2, 3];
+  const onboardingSteps = [0, 1, 2, 3, 4];
   const steps = mode === "edit" ? editSteps : onboardingSteps;
   const totalSteps = steps.length;
 
@@ -470,19 +471,60 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     createEmptyStory(),
   ]);
 
-  // Scraping & analyzing
+  // Scraping & analyzing (runs in background)
   const [jobId, setJobId] = useState<string | null>(null);
   const [analyzingPhase, setAnalyzingPhase] = useState<AnalyzingPhase>("idle");
   const [scrapePostsFound, setScrapePostsFound] = useState(0);
+  const [reelsTranscribed, setReelsTranscribed] = useState(0);
+  const [reelsClassified, setReelsClassified] = useState(0);
+  const [reelsRequested, setReelsRequested] = useState(0);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
-  const scrapingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stepIndexRef = useRef(stepIndex);
+  stepIndexRef.current = stepIndex;
+  const dnaReadyRef = useRef(false);
 
   // Cleanup polling on unmount
   useEffect(() => {
     return () => {
-      if (scrapingIntervalRef.current) clearInterval(scrapingIntervalRef.current);
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
     };
   }, []);
+
+  // Persist progress to localStorage (onboarding only)
+  const STORAGE_KEY = "eyeballs_onboarding_progress";
+
+  useEffect(() => {
+    if (mode !== "onboarding") return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.formData) setFormData((prev) => ({ ...prev, ...parsed.formData }));
+        if (parsed.stories?.length) setStories(parsed.stories);
+        if (typeof parsed.stepIndex === "number" && parsed.stepIndex > 0) {
+          const safeIdx = Math.min(parsed.stepIndex, totalSteps - 1);
+          setStepIndex(safeIdx);
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (mode !== "onboarding") return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ formData, stories, stepIndex })
+      );
+    } catch {
+      // ignore quota errors
+    }
+  }, [formData, stories, stepIndex, mode]);
 
   // Step transition helper
   const transitionTo = useCallback(
@@ -521,8 +563,13 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   }
 
   // ---------------------------------------------------------------------------
-  // Scraping & AI Analysis (Step 3 auto-flow)
+  // Scraping & AI Analysis (runs in BACKGROUND while user fills other steps)
   // ---------------------------------------------------------------------------
+
+  function showToast(msg: string) {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 5000);
+  }
 
   async function triggerScrapeAndAnalyze() {
     const handle = (formData.social_handles.instagram ?? "").trim().replace(/^@/, "");
@@ -530,39 +577,74 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
 
     setAnalyzingPhase("scraping");
     setScrapePostsFound(0);
+    setReelsTranscribed(0);
+    setReelsClassified(0);
     setAnalyzeError(null);
+    dnaReadyRef.current = false;
+
+    showToast("Starting profile analysis...");
 
     try {
-      // Start scrape
-      const scrapeRes = await fetch("/api/onboarding/scrape", {
+      // Start profile analysis
+      const startRes = await fetch("/api/profile-analyzer/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          social_handles: { instagram: handle },
-          inspiration_handles: [],
-        }),
+        body: JSON.stringify({ handle, reel_count: 10 }),
       });
 
-      if (!scrapeRes.ok) {
-        throw new Error("Failed to start scraping");
+      if (!startRes.ok) {
+        throw new Error("Failed to start profile analysis");
       }
 
-      const { job_id } = await scrapeRes.json();
+      const { job_id } = await startRes.json();
       setJobId(job_id);
+      setReelsRequested(10);
 
-      // Poll scrape status
+      // Poll status until done or error (timeout after 300s)
+      const startTime = Date.now();
       await new Promise<void>((resolve, reject) => {
-        scrapingIntervalRef.current = setInterval(async () => {
+        pollingIntervalRef.current = setInterval(async () => {
           try {
-            const statusRes = await fetch(`/api/onboarding/scrape-status?job_id=${job_id}`);
+            if (Date.now() - startTime > 300_000) {
+              if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+              reject(new Error("Analysis timed out"));
+              return;
+            }
+
+            const statusRes = await fetch(`/api/profile-analyzer/status?job_id=${job_id}`);
             if (!statusRes.ok) return;
             const data = await statusRes.json();
-            setScrapePostsFound(data.posts_found ?? 0);
+
+            // Update progress state
+            setScrapePostsFound(data.reels_scraped ?? 0);
+            setReelsTranscribed(data.reels_transcribed ?? 0);
+            setReelsClassified(data.reels_classified ?? 0);
+            setReelsRequested(data.reels_requested ?? 10);
+
+            // Update phase for toast messages
+            const serverStatus = data.status as AnalyzingPhase;
+            if (serverStatus === "scraping") {
+              setAnalyzingPhase("scraping");
+              if (data.reels_scraped > 0) {
+                showToast(`Scraping reels... (${data.reels_scraped}/${data.reels_requested})`);
+              } else {
+                showToast("Scraping reels from Instagram...");
+              }
+            } else if (serverStatus === "transcribing") {
+              setAnalyzingPhase("transcribing");
+              showToast(`Transcribing reels... (${data.reels_transcribed}/${data.reels_scraped})`);
+            } else if (serverStatus === "classifying") {
+              setAnalyzingPhase("classifying");
+              showToast(`Classifying reels... (${data.reels_classified}/${data.reels_scraped})`);
+            } else if (serverStatus === "analyzing_dna") {
+              setAnalyzingPhase("analyzing_dna");
+              showToast("Building your Brand DNA from all data...");
+            }
 
             if (data.status === "done" || data.status === "error") {
-              if (scrapingIntervalRef.current) clearInterval(scrapingIntervalRef.current);
-              if (data.status === "error" && (data.posts_found ?? 0) < 3) {
-                reject(new Error("Scraping failed. Not enough posts found."));
+              if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+              if (data.status === "error") {
+                reject(new Error(data.errors?.[data.errors.length - 1] || "Analysis failed"));
               } else {
                 resolve();
               }
@@ -573,53 +655,47 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
         }, 3000);
       });
 
-      // Now analyze
-      setAnalyzingPhase("analyzing");
-
-      const analyzeRes = await fetch("/api/onboarding/analyze-brand-dna", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ job_id }),
-      });
-
-      if (!analyzeRes.ok) {
-        const errData = await analyzeRes.json().catch(() => ({}));
-        throw new Error(errData.error || "AI analysis failed");
+      // Fetch results
+      const resultsRes = await fetch(`/api/profile-analyzer/results?job_id=${job_id}`);
+      if (!resultsRes.ok) {
+        throw new Error("Failed to fetch analysis results");
       }
 
-      const dna: BrandDNAAnalysis = await analyzeRes.json();
+      const results = await resultsRes.json();
+      const dna = results.brand_dna as BrandDNAAnalysis | null;
 
-      // Merge AI results into formData
-      setFormData((prev) => ({
-        ...prev,
-        niche: dna.niche || prev.niche,
-        tone_descriptors: dna.tone_descriptors?.length ? dna.tone_descriptors : prev.tone_descriptors,
-        tone_formality: dna.tone_formality ?? prev.tone_formality,
-        tone_humor: dna.tone_humor ?? prev.tone_humor,
-        tone_authority: dna.tone_authority ?? prev.tone_authority,
-        creator_archetype: dna.creator_archetype || prev.creator_archetype,
-        content_pillars: dna.content_pillars?.length ? dna.content_pillars : prev.content_pillars,
-        content_goal: dna.content_goal || prev.content_goal,
-        content_formats: dna.content_formats?.length ? dna.content_formats : prev.content_formats,
-        preferred_cta: dna.preferred_cta?.length ? dna.preferred_cta : prev.preferred_cta,
-        values: dna.values?.length ? dna.values : prev.values,
-        target_audience: dna.target_audience || prev.target_audience,
-        audience_problem: dna.audience_problem || prev.audience_problem,
-        audience_age_ranges: dna.audience_age_ranges?.length ? dna.audience_age_ranges : prev.audience_age_ranges,
-        audience_gender: dna.audience_gender || prev.audience_gender,
-        unique_value_prop: dna.unique_value_prop || prev.unique_value_prop,
-      }));
+      if (dna) {
+        // Merge AI results into formData
+        setFormData((prev) => ({
+          ...prev,
+          niche: dna.niche || prev.niche,
+          tone_descriptors: dna.tone_descriptors?.length ? dna.tone_descriptors : prev.tone_descriptors,
+          tone_formality: dna.tone_formality ?? prev.tone_formality,
+          tone_humor: dna.tone_humor ?? prev.tone_humor,
+          tone_authority: dna.tone_authority ?? prev.tone_authority,
+          creator_archetype: dna.creator_archetype || prev.creator_archetype,
+          content_pillars: dna.content_pillars?.length ? dna.content_pillars : prev.content_pillars,
+          content_goal: dna.content_goal || prev.content_goal,
+          content_formats: dna.content_formats?.length ? dna.content_formats : prev.content_formats,
+          preferred_cta: dna.preferred_cta?.length ? dna.preferred_cta : prev.preferred_cta,
+          values: dna.values?.length ? dna.values : prev.values,
+          target_audience: dna.target_audience || prev.target_audience,
+          audience_problem: dna.audience_problem || prev.audience_problem,
+          audience_age_ranges: dna.audience_age_ranges?.length ? dna.audience_age_ranges : prev.audience_age_ranges,
+          audience_gender: dna.audience_gender || prev.audience_gender,
+          unique_value_prop: dna.unique_value_prop || prev.unique_value_prop,
+        }));
+      }
 
       setAnalyzingPhase("done");
-
-      // Auto-advance to Brand DNA step after a brief moment
-      setTimeout(() => {
-        transitionTo(stepIndex + 1);
-      }, 800);
+      dnaReadyRef.current = true;
+      showToast("Brand Voice DNA ready! Review it on the Brand DNA step.");
     } catch (err) {
-      console.error("[brand-profile-form] scrape/analyze error:", err);
+      console.error("[brand-profile-form] profile analysis error:", err);
       setAnalyzeError(err instanceof Error ? err.message : "Something went wrong");
       setAnalyzingPhase("error");
+      dnaReadyRef.current = true; // still let them proceed to Brand DNA step
+      showToast("Couldn't analyze automatically. You can fill in Brand DNA manually.");
     }
   }
 
@@ -630,30 +706,31 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   function validateCurrentStep(): string | null {
     switch (currentStep) {
       case 0:
+        // Instagram step — handle is optional (they can skip)
+        return null;
+      case 1:
+        // About You
         if (!formData.display_name.trim()) return "Please enter your name";
         if (!formData.creator_type) return "Please select your creator type";
         if (!formData.primary_platform) return "Please select your primary platform";
         return null;
-      case 1: {
+      case 2: {
+        // Your Story
         if (!formData.personal_bio.trim()) return "Please tell us your backstory";
         const filledStories = stories.filter((s) => s.title.trim() && s.content.trim());
         if (filledStories.length < 3) return "Please fill in at least 3 Key Moments (title + content)";
         return null;
       }
-      case 2:
-        // Instagram handle required (or they can skip)
-        return null;
       case 3:
-        // Auto-advance step, no validation
-        return null;
-      case 4:
+        // Brand DNA
         if (!formData.niche.trim()) return "Please select or enter your niche";
         if (formData.tone_descriptors.length === 0) return "Please select at least one tone descriptor";
         if (!formData.creator_archetype) return "Please choose your creator archetype";
         if (formData.content_pillars.length === 0) return "Please select at least one content pillar";
         if (!formData.content_goal) return "Please select your content goal";
         return null;
-      case 5:
+      case 4:
+        // Launch
         return null;
       default:
         return null;
@@ -672,18 +749,13 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
       return;
     }
 
-    // When leaving step 2 (Instagram), trigger scrape + analyze and go to step 3
-    if (currentStep === 2) {
+    // When leaving step 0 (Instagram), trigger background scrape + analyze
+    if (currentStep === 0) {
       const handle = (formData.social_handles.instagram ?? "").trim().replace(/^@/, "");
-      if (handle) {
-        transitionTo(stepIndex + 1); // go to analyzing step
-        // Start scrape after transition
-        setTimeout(() => triggerScrapeAndAnalyze(), 200);
-        return;
+      if (handle && analyzingPhase === "idle") {
+        // Fire and forget — runs in background while user fills About You + Story
+        triggerScrapeAndAnalyze();
       }
-      // No handle - skip to Brand DNA step (step 4)
-      transitionTo(stepIndex + 2);
-      return;
     }
 
     const nextIndex = stepIndex + 1;
@@ -695,11 +767,6 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   function handleBack() {
     setError(null);
     if (stepIndex > 0) {
-      // If on analyzing step and going back, reset phase
-      if (currentStep === 3) {
-        setAnalyzingPhase("idle");
-        if (scrapingIntervalRef.current) clearInterval(scrapingIntervalRef.current);
-      }
       transitionTo(stepIndex - 1);
     }
   }
@@ -763,15 +830,18 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
       };
 
       if (mode === "onboarding") {
-        const { error: insertError } = await supabase
+        const { error: upsertError } = await supabase
           .from("brand_profiles")
-          .insert({
-            ...payload,
-            onboarding_completed_at: new Date().toISOString(),
-          });
+          .upsert(
+            {
+              ...payload,
+              onboarding_completed_at: new Date().toISOString(),
+            },
+            { onConflict: "user_id" }
+          );
 
-        if (insertError) {
-          setError(insertError.message);
+        if (upsertError) {
+          setError(upsertError.message);
           setSaving(false);
           return;
         }
@@ -794,6 +864,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
           });
         }
 
+        try { localStorage.removeItem(STORAGE_KEY); } catch {}
         router.push("/dashboard");
       } else {
         const { error: updateError } = await supabase
@@ -834,12 +905,11 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   // ---------------------------------------------------------------------------
 
   const STEP_LABELS: Record<number, string> = {
-    0: "About You",
-    1: "Your Story",
-    2: "Instagram",
-    3: "Analyzing",
-    4: "Brand DNA",
-    5: "Launch",
+    0: "Instagram",
+    1: "About You",
+    2: "Your Story",
+    3: "Brand DNA",
+    4: "Launch",
   };
 
   function toneSummaryLabel(value: number, left: string, right: string) {
@@ -852,7 +922,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   // Render steps
   // ---------------------------------------------------------------------------
 
-  function renderStep0() {
+  function renderStep1AboutYou() {
     const creatorTypes = [
       { id: "solo_creator" as const, label: "Solo Creator", description: "I create content for my personal brand", icon: <PersonIcon /> },
       { id: "brand" as const, label: "Brand", description: "I create content for a company or product", icon: <BuildingIcon /> },
@@ -960,7 +1030,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     );
   }
 
-  function renderStep1YourStory() {
+  function renderStep2YourStory() {
     return (
       <div className="space-y-8">
         <div className="space-y-2">
@@ -1143,13 +1213,13 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     );
   }
 
-  function renderStep2Instagram() {
+  function renderStep0Instagram() {
     return (
       <div className="space-y-8">
         <div className="space-y-2">
           <h1 style={headingStyle}>Connect your Instagram</h1>
           <p style={subtitleStyle}>
-            We&apos;ll analyze your latest posts to build your Brand DNA automatically. No manual setup needed.
+            We&apos;ll download your latest reels and analyze how you speak, your hooks, tone, and content patterns to build your Voice DNA automatically.
           </p>
         </div>
 
@@ -1190,7 +1260,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
                   What happens next
                 </p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#888888", lineHeight: 1.5 }}>
-                  We&apos;ll download your latest 15 posts and use AI to analyze your captions, hook styles, tone, vocabulary, and content patterns. From that, we&apos;ll generate your complete Brand DNA, so you don&apos;t have to fill it in manually.
+                  While you fill in the next steps, we&apos;ll download your latest reels in the background and use AI to analyze your captions, hooks, tone, and vocabulary. By the time you reach Brand DNA, it&apos;ll be ready for review.
                 </p>
               </div>
             </div>
@@ -1203,8 +1273,8 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
             type="button"
             onClick={() => {
               setError(null);
-              // Skip to Brand DNA step (step 4, which is stepIndex + 2)
-              transitionTo(stepIndex + 2);
+              // Skip Instagram, go to About You
+              transitionTo(stepIndex + 1);
             }}
             style={{
               fontFamily: "var(--font-body)",
@@ -1217,89 +1287,14 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
               textUnderlineOffset: "3px",
             }}
           >
-            Skip and fill in manually
+            Skip — I&apos;ll fill in Brand DNA manually
           </button>
         </div>
       </div>
     );
   }
 
-  function renderStep3Analyzing() {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-6" style={{ minHeight: 400 }}>
-        {analyzingPhase === "scraping" && (
-          <>
-            <SpinnerIcon size={48} />
-            <div className="text-center space-y-2">
-              <h2 style={{ ...headingStyle, fontSize: "22px" }}>Scraping your latest posts...</h2>
-              <p style={subtitleStyle}>
-                {scrapePostsFound > 0
-                  ? `${scrapePostsFound} posts found so far`
-                  : "Connecting to Instagram..."
-                }
-              </p>
-            </div>
-          </>
-        )}
-
-        {analyzingPhase === "analyzing" && (
-          <>
-            <SpinnerIcon size={48} color="#FF2D2D" />
-            <div className="text-center space-y-2">
-              <h2 style={{ ...headingStyle, fontSize: "22px" }}>Building your Brand DNA...</h2>
-              <p style={subtitleStyle}>
-                Analyzing your captions, hooks, tone, and content patterns
-              </p>
-            </div>
-          </>
-        )}
-
-        {analyzingPhase === "done" && (
-          <>
-            <div style={{ animation: "scaleIn 0.5s ease-out" }}>
-              <CheckCircleIcon />
-            </div>
-            <div className="text-center space-y-2">
-              <h2 style={{ ...headingStyle, fontSize: "22px" }}>Brand DNA ready!</h2>
-              <p style={subtitleStyle}>Let&apos;s review what we found...</p>
-            </div>
-          </>
-        )}
-
-        {analyzingPhase === "error" && (
-          <div className="text-center space-y-4">
-            <div style={{ color: "#FF2D2D", fontSize: 48 }}>!</div>
-            <h2 style={{ ...headingStyle, fontSize: "22px" }}>Something went wrong</h2>
-            <p style={{ ...subtitleStyle, color: "#f87171" }}>
-              {analyzeError || "We couldn't analyze your content."}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setAnalyzingPhase("idle");
-                // Skip to brand DNA step for manual fill
-                transitionTo(stepIndex + 1);
-              }}
-              className="rounded-lg px-6 py-3 transition-all duration-200 hover:border-[#FF2D2D] hover:scale-[1.02]"
-              style={{
-                border: "1px solid #333",
-                color: "#A1A1A1",
-                fontFamily: "var(--font-body)",
-                fontSize: "14px",
-                fontWeight: 500,
-                background: "transparent",
-                cursor: "pointer",
-              }}
-            >
-              Continue manually
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  function renderStep4BrandDNA() {
+  function renderStep3BrandDNA() {
     const goalOptions = [
       { id: "grow_audience", label: "Grow my audience", icon: <ChartUpIcon /> },
       { id: "drive_sales", label: "Drive sales", icon: <DollarIcon /> },
@@ -1308,16 +1303,39 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
       { id: "entertain", label: "Entertain", icon: <SparkleIcon /> },
     ];
 
+    const isStillAnalyzing = analyzingPhase !== "idle" && analyzingPhase !== "done" && analyzingPhase !== "error";
+
     return (
       <div className="space-y-8">
         <div className="space-y-2">
           <h1 style={headingStyle}>Your Brand DNA</h1>
           <p style={subtitleStyle}>
             {analyzingPhase === "done"
-              ? "Here's your Brand DNA based on your content. Edit or add anything we missed."
-              : "Define your voice, strategy, and audience."}
+              ? "Here's your Voice DNA based on your content. Edit or add anything we missed."
+              : isStillAnalyzing
+                ? "We're still analyzing your content. You can start editing below — fields will auto-fill when ready."
+                : "Define your voice, strategy, and audience."}
           </p>
         </div>
+
+        {/* Still analyzing banner */}
+        {isStillAnalyzing && (
+          <div
+            className="flex items-center gap-3 rounded-xl p-4"
+            style={{ background: "rgba(0, 212, 212, 0.08)", border: "1px solid rgba(0, 212, 212, 0.2)" }}
+          >
+            <SpinnerIcon size={20} color="#00D4D4" />
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#00D4D4" }}>
+              {analyzingPhase === "scraping"
+                ? `Scraping reels${scrapePostsFound > 0 ? ` (${scrapePostsFound}/${reelsRequested})` : ""}...`
+                : analyzingPhase === "transcribing"
+                  ? `Transcribing reels (${reelsTranscribed}/${scrapePostsFound})...`
+                  : analyzingPhase === "classifying"
+                    ? `Classifying reels (${reelsClassified}/${scrapePostsFound})...`
+                    : "Building your Brand DNA from all data..."}
+            </p>
+          </div>
+        )}
 
         {/* Voice & Tone Section */}
         <div className="space-y-6">
@@ -1589,7 +1607,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     );
   }
 
-  function renderStep5Launch() {
+  function renderStep4Launch() {
     const archLabel =
       ARCHETYPE_OPTIONS.find((a) => a.id === formData.creator_archetype)?.label ??
       formData.creator_archetype;
@@ -1806,9 +1824,8 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   // Main render
   // ---------------------------------------------------------------------------
 
-  const isAnalyzingStep = mode === "onboarding" && currentStep === 3;
-  const isLaunchStep = mode === "onboarding" && currentStep === 5;
-  const showNav = !isAnalyzingStep && !isLaunchStep;
+  const isLaunchStep = mode === "onboarding" && currentStep === 4;
+  const showNav = !isLaunchStep;
 
   const isLastFormStep =
     mode === "edit"
@@ -1817,6 +1834,35 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-8">
+      {/* Toast notification (top-right) */}
+      {toastMessage && (
+        <div
+          className="fixed top-4 right-4 z-50 rounded-xl px-5 py-3 shadow-lg"
+          style={{
+            background: "#1A1A1A",
+            border: "1px solid #2A2A2A",
+            color: "#FAFAFA",
+            fontFamily: "var(--font-body)",
+            fontSize: "13px",
+            maxWidth: 360,
+            animation: "slideInRight 0.3s ease-out",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {analyzingPhase !== "idle" && analyzingPhase !== "done" && analyzingPhase !== "error" && (
+              <SpinnerIcon size={16} color="#00D4D4" />
+            )}
+            {analyzingPhase === "done" && (
+              <span style={{ color: "#00D4D4" }}>&#10003;</span>
+            )}
+            {analyzingPhase === "error" && (
+              <span style={{ color: "#FF2D2D" }}>!</span>
+            )}
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
       {/* CSS keyframes */}
       <style>{`
         @keyframes scaleIn {
@@ -1824,10 +1870,14 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
           60% { transform: scale(1.15); }
           100% { transform: scale(1); opacity: 1; }
         }
+        @keyframes slideInRight {
+          0% { transform: translateX(100%); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
       `}</style>
 
-      {/* Progress bar (not shown on analyzing or launch) */}
-      {!isAnalyzingStep && !isLaunchStep && (
+      {/* Progress bar (not shown on launch) */}
+      {!isLaunchStep && (
         <div className="space-y-2">
           <div className="flex justify-between">
             <span
@@ -1840,7 +1890,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
                 letterSpacing: "0.5px",
               }}
             >
-              Step {stepIndex + 1} of {mode === "onboarding" ? totalSteps - 1 : totalSteps}
+              Step {stepIndex + 1} of {totalSteps}
             </span>
             <span
               style={{
@@ -1858,14 +1908,14 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
               className="h-1 rounded-full transition-all duration-300"
               style={{
                 width: `${
-                  ((stepIndex + 1) / (mode === "onboarding" ? totalSteps - 1 : totalSteps)) * 100
+                  ((stepIndex + 1) / totalSteps) * 100
                 }%`,
                 background: "linear-gradient(90deg, #FF2D2D, #00D4D4)",
               }}
               role="progressbar"
               aria-valuenow={stepIndex + 1}
               aria-valuemin={1}
-              aria-valuemax={mode === "onboarding" ? totalSteps - 1 : totalSteps}
+              aria-valuemax={totalSteps}
             />
           </div>
         </div>
@@ -1894,12 +1944,11 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
           className="transition-opacity duration-150"
           style={{ opacity: fadeState === "in" ? 1 : 0 }}
         >
-          {currentStep === 0 && renderStep0()}
-          {currentStep === 1 && renderStep1YourStory()}
-          {currentStep === 2 && renderStep2Instagram()}
-          {currentStep === 3 && renderStep3Analyzing()}
-          {currentStep === 4 && renderStep4BrandDNA()}
-          {currentStep === 5 && renderStep5Launch()}
+          {currentStep === 0 && renderStep0Instagram()}
+          {currentStep === 1 && renderStep1AboutYou()}
+          {currentStep === 2 && renderStep2YourStory()}
+          {currentStep === 3 && renderStep3BrandDNA()}
+          {currentStep === 4 && renderStep4Launch()}
         </div>
 
         {/* Navigation */}

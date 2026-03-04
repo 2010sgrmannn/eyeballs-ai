@@ -4,6 +4,26 @@ export type Platform = "instagram" | "tiktok" | "linkedin" | "twitter";
 export type ScriptStyle = "short" | "medium" | "long";
 export type TagCategory = "niche" | "topic" | "style" | "hook_type" | "emotion";
 export type ContentTagCategory = TagCategory;
+export type ReelType =
+  | "talking_head"
+  | "transition"
+  | "text_overlay_music"
+  | "voiceover"
+  | "skit"
+  | "tutorial"
+  | "montage"
+  | "interview"
+  | "reaction"
+  | "other";
+
+export type ProfileAnalysisStatus =
+  | "pending"
+  | "scraping"
+  | "transcribing"
+  | "classifying"
+  | "analyzing_dna"
+  | "done"
+  | "error";
 
 export interface Creator {
   id: string;
@@ -12,6 +32,8 @@ export interface Creator {
   handle: string;
   display_name: string | null;
   follower_count: number | null;
+  bio: string | null;
+  profile_pic_url: string | null;
   scraped_at: string | null;
   created_at: string;
 }
@@ -96,6 +118,7 @@ export interface Content {
   virality_score: number | null;
   hook_text: string | null;
   cta_text: string | null;
+  reel_type: ReelType | null;
   carousel_urls: string[] | null;
   posted_at: string | null;
   analyzed_at: string | null;
@@ -166,6 +189,21 @@ export interface Niche {
   name: string;
   description: string | null;
   created_at: string;
+}
+
+export interface ProfileAnalysisJob {
+  id: string;
+  user_id: string;
+  handle: string;
+  status: ProfileAnalysisStatus;
+  reels_requested: number;
+  reels_scraped: number;
+  reels_transcribed: number;
+  reels_classified: number;
+  brand_dna: Record<string, unknown> | null;
+  errors: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ContentWithRelations extends Content {
