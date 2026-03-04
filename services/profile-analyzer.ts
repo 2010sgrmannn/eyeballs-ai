@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClientWithToken } from "@/lib/supabase/server";
 import { getAnthropicClient } from "@/lib/anthropic";
 import { calculateEngagementRatio } from "@/services/scraper";
 import {
@@ -275,26 +275,33 @@ Return ONLY valid JSON:
 // ---------------------------------------------------------------------------
 
 async function updateJob(
+  supabase: ReturnType<typeof createClientWithToken>,
   jobId: string,
   updates: Record<string, unknown>
 ) {
-  const supabase = await createClient();
-  await supabase
+  const { error } = await supabase
     .from("profile_analysis_jobs")
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq("id", jobId);
+
+  if (error) {
+    console.error(`[profile-analyzer] updateJob failed for ${jobId}:`, error.message);
+  }
 }
 
-async function appendJobError(jobId: string, error: string) {
-  const supabase = await createClient();
+async function appendJobError(
+  supabase: ReturnType<typeof createClientWithToken>,
+  jobId: string,
+  errorMsg: string
+) {
   const { data } = await supabase
     .from("profile_analysis_jobs")
     .select("errors")
     .eq("id", jobId)
     .single();
 
-  await updateJob(jobId, {
-    errors: [...(data?.errors || []), error],
+  await updateJob(supabase, jobId, {
+    errors: [...(data?.errors || []), errorMsg],
   });
 }
 
@@ -306,15 +313,16 @@ export async function runProfileAnalysis(
   jobId: string,
   userId: string,
   handle: string,
-  reelCount: number
+  reelCount: number,
+  accessToken: string
 ) {
-  const supabase = await createClient();
+  const supabase = createClientWithToken(accessToken);
 
   try {
     // -----------------------------------------------------------------------
     // Stage 1: Scrape
     // -----------------------------------------------------------------------
-    await updateJob(jobId, { status: "scraping" });
+    await updateJob(supabase, jobId, { status: "scraping" });
 
     const token = process.env.APIFY_API_TOKEN;
     if (!token || token === "placeholder") {
@@ -353,7 +361,7 @@ export async function runProfileAnalysis(
       bio = mapped.bio;
     } catch (err) {
       console.error(`[profile-analyzer] Profile fetch failed for @${handle}:`, err);
-      await appendJobError(jobId, `Profile fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+      await appendJobError(supabase, jobId, `Profile fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     // Upsert creator
@@ -455,12 +463,12 @@ export async function runProfileAnalysis(
       throw new Error("No content rows found after save");
     }
 
-    await updateJob(jobId, { reels_scraped: savedContent.length });
+    await updateJob(supabase, jobId, { reels_scraped: savedContent.length });
 
     // -----------------------------------------------------------------------
     // Stage 2: Transcribe
     // -----------------------------------------------------------------------
-    await updateJob(jobId, { status: "transcribing" });
+    await updateJob(supabase, jobId, { status: "transcribing" });
 
     const reelDataList: ReelData[] = [];
     const transcribeConcurrency = 3;
@@ -476,7 +484,7 @@ export async function runProfileAnalysis(
             } catch (err) {
               console.error(`[profile-analyzer] Transcription failed for ${c.external_id}:`, err);
               await appendJobError(
-                jobId,
+                supabase, jobId,
                 `Transcription failed for ${c.external_id}: ${err instanceof Error ? err.message : String(err)}`
               );
             }
@@ -508,13 +516,13 @@ export async function runProfileAnalysis(
         }
       }
 
-      await updateJob(jobId, { reels_transcribed: reelDataList.length });
+      await updateJob(supabase, jobId, { reels_transcribed: reelDataList.length });
     }
 
     // -----------------------------------------------------------------------
     // Stage 3: Classify
     // -----------------------------------------------------------------------
-    await updateJob(jobId, { status: "classifying" });
+    await updateJob(supabase, jobId, { status: "classifying" });
 
     const classifyConcurrency = 5;
     let classified = 0;
@@ -555,24 +563,24 @@ export async function runProfileAnalysis(
           } catch (err) {
             console.error(`[profile-analyzer] Classification failed for ${reel.content_id}:`, err);
             await appendJobError(
-              jobId,
+              supabase, jobId,
               `Classification failed: ${err instanceof Error ? err.message : String(err)}`
             );
           }
         })
       );
 
-      await updateJob(jobId, { reels_classified: classified });
+      await updateJob(supabase, jobId, { reels_classified: classified });
     }
 
     // -----------------------------------------------------------------------
     // Stage 4: Brand DNA
     // -----------------------------------------------------------------------
-    await updateJob(jobId, { status: "analyzing_dna" });
+    await updateJob(supabase, jobId, { status: "analyzing_dna" });
 
     const brandDNA = await generateBrandDNA(bio, reelDataList);
 
-    await updateJob(jobId, {
+    await updateJob(supabase, jobId, {
       status: "done",
       brand_dna: brandDNA,
     });
@@ -580,9 +588,9 @@ export async function runProfileAnalysis(
     console.log(`[profile-analyzer] Done for @${handle}: ${reelDataList.length} reels processed`);
   } catch (err) {
     console.error(`[profile-analyzer] Fatal error for job ${jobId}:`, err);
-    await updateJob(jobId, { status: "error" });
+    await updateJob(supabase, jobId, { status: "error" });
     await appendJobError(
-      jobId,
+      supabase, jobId,
       err instanceof Error ? err.message : String(err)
     );
   }

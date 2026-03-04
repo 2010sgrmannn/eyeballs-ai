@@ -35,6 +35,9 @@ interface StoryDraft {
 interface BrandProfileFormProps {
   initialData?: BrandProfileFormData;
   mode: "onboarding" | "edit";
+  onAnalysisStart?: (handle: string) => void;
+  startAtStep?: number;
+  initialDnaData?: Partial<BrandProfileFormData>;
 }
 
 type AnalyzingPhase = "idle" | "scraping" | "transcribing" | "classifying" | "analyzing_dna" | "done" | "error";
@@ -444,7 +447,7 @@ function SpinnerIcon({ size = 18, color = "#00D4D4" }: { size?: number; color?: 
 // Main Component
 // ---------------------------------------------------------------------------
 
-export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
+export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtStep, initialDnaData }: BrandProfileFormProps) {
   const router = useRouter();
 
   // Step mapping: 0=Instagram, 1=About You, 2=Your Story, 3=Brand DNA, 4=Launch
@@ -454,7 +457,8 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
   const steps = mode === "edit" ? editSteps : onboardingSteps;
   const totalSteps = steps.length;
 
-  const [stepIndex, setStepIndex] = useState(0);
+  const computedStartIndex = startAtStep !== undefined ? steps.indexOf(startAtStep) : 0;
+  const [stepIndex, setStepIndex] = useState(computedStartIndex >= 0 ? computedStartIndex : 0);
   const currentStep = steps[stepIndex];
 
   const [formData, setFormData] = useState<BrandProfileFormData>(
@@ -499,6 +503,22 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
     } catch {
       // ignore
     }
+  }, []);
+
+  // Merge initialDnaData (from analysis screen) into formData on mount
+  useEffect(() => {
+    if (initialDnaData) {
+      setFormData((prev) => {
+        const merged = { ...prev };
+        for (const [key, value] of Object.entries(initialDnaData)) {
+          if (value !== undefined) {
+            (merged as Record<string, unknown>)[key] = value;
+          }
+        }
+        return merged;
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Step transition helper
@@ -724,12 +744,19 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
       return;
     }
 
-    // When leaving step 0 (Instagram), trigger background scrape + analyze
+    // When leaving step 0 (Instagram), trigger analysis
     if (currentStep === 0) {
       const handle = (formData.social_handles.instagram ?? "").trim().replace(/^@/, "");
-      if (handle && analyzingPhase === "idle") {
-        // Fire and forget — runs in background while user fills About You + Story
-        triggerScrapeAndAnalyze();
+      if (handle) {
+        if (onAnalysisStart) {
+          // Delegate to parent (OnboardingFlow) — shows the full analysis screen
+          onAnalysisStart(handle);
+          return;
+        }
+        if (analyzingPhase === "idle") {
+          // Fire and forget — runs in background while user fills About You + Story
+          triggerScrapeAndAnalyze();
+        }
       }
     }
 
@@ -1278,7 +1305,7 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
       { id: "entertain", label: "Entertain", icon: <SparkleIcon /> },
     ];
 
-    const isStillAnalyzing = analyzingPhase !== "idle" && analyzingPhase !== "done" && analyzingPhase !== "error";
+    const isStillAnalyzing = !onAnalysisStart && analyzingPhase !== "idle" && analyzingPhase !== "done" && analyzingPhase !== "error";
 
     return (
       <div className="space-y-8">
@@ -1809,8 +1836,8 @@ export function BrandProfileForm({ initialData, mode }: BrandProfileFormProps) {
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-8">
-      {/* Toast notification (top-right) */}
-      {toastMessage && (
+      {/* Toast notification (top-right) — hidden when analysis screen handles it */}
+      {!onAnalysisStart && toastMessage && (
         <div
           className="fixed top-4 right-4 z-50 rounded-xl px-5 py-3 shadow-lg"
           style={{

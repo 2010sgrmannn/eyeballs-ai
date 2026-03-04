@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { BrandProfileForm } from "@/components/brand-profile-form";
+import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reset?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -12,26 +16,30 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // If user already has a brand profile, redirect to dashboard
-  const { data: profile } = await supabase
-    .from("brand_profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
+  const params = await searchParams;
 
-  if (profile) {
-    redirect("/dashboard");
+  // If reset=true, clear onboarding_completed_at so user can redo onboarding
+  if (params.reset === "true") {
+    await supabase
+      .from("brand_profiles")
+      .update({ onboarding_completed_at: null })
+      .eq("user_id", user.id);
+  } else {
+    // If user already completed onboarding, redirect to dashboard
+    const { data: profile } = await supabase
+      .from("brand_profiles")
+      .select("id, onboarding_completed_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (profile?.onboarding_completed_at) {
+      redirect("/dashboard");
+    }
   }
 
   return (
-    <div className="mx-auto max-w-3xl py-8">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold">Set up your brand profile</h1>
-        <p className="mt-2 text-neutral-400">
-          Tell us about your brand so we can help you create better content.
-        </p>
-      </div>
-      <BrandProfileForm mode="onboarding" />
+    <div className="mx-auto max-w-4xl px-4 py-12">
+      <OnboardingFlow />
     </div>
   );
 }
