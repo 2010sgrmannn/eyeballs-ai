@@ -164,7 +164,89 @@ export class MockScraperService implements ScraperService {
   }
 }
 
-/** Get the active scraper service. Swap this for a real implementation later. */
+/**
+ * Real Instagram scraper using Apify actors.
+ * Ported from 2010sgrmannn/ig-scraper Python implementation.
+ */
+export class ApifyScraperService implements ScraperService {
+  private token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+
+  private async getClient() {
+    const { ApifyClient } = await import("apify-client");
+    return new ApifyClient({ token: this.token });
+  }
+
+  async scrape(
+    platform: Platform,
+    handle: string,
+    depth: ScrapeDepth
+  ): Promise<{
+    displayName: string;
+    followerCount: number;
+    posts: ScrapedPost[];
+  }> {
+    if (platform !== "instagram") {
+      throw new Error(
+        `Scraping for ${platform} is not yet implemented. Only Instagram is available.`
+      );
+    }
+
+    const { mapApifyPostToScrapedPost, mapApifyProfile } = await import(
+      "@/services/apify-mapper"
+    );
+
+    const profileUrl = `https://www.instagram.com/${handle}/`;
+    const client = await this.getClient();
+
+    // Fetch profile info
+    const profileRun = await client
+      .actor("apify/instagram-api-scraper")
+      .call({
+        directUrls: [profileUrl],
+        resultsType: "details",
+        resultsLimit: 1,
+      });
+
+    const profileItems = await client
+      .dataset(profileRun.defaultDatasetId)
+      .listItems();
+
+    const profile = profileItems.items[0] as Record<string, unknown> | undefined;
+    const { displayName, followerCount } = mapApifyProfile(profile, handle);
+
+    // Fetch posts/reels
+    const postsRun = await client
+      .actor("apify/instagram-api-scraper")
+      .call({
+        directUrls: [profileUrl],
+        resultsType: "posts",
+        resultsLimit: depth,
+      });
+
+    const postsItems = await client
+      .dataset(postsRun.defaultDatasetId)
+      .listItems();
+
+    const posts: ScrapedPost[] = (
+      postsItems.items as Record<string, unknown>[]
+    ).map((item, i) => mapApifyPostToScrapedPost(item, handle, i));
+
+    return { displayName, followerCount, posts };
+  }
+}
+
+/**
+ * Get the active scraper service.
+ * Uses real Apify scraper when APIFY_API_TOKEN is set, otherwise falls back to mock.
+ */
 export function getScraperService(): ScraperService {
+  const token = process.env.APIFY_API_TOKEN;
+  if (token && token !== "placeholder") {
+    return new ApifyScraperService(token);
+  }
   return new MockScraperService();
 }

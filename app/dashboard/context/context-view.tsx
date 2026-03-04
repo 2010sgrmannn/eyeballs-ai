@@ -469,7 +469,6 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
   const updateProfile = useCallback(async (fields: Record<string, unknown>) => {
     // Optimistic update — apply immediately so the UI doesn't flash back
-    const previous = profile;
     setProfile((prev) => prev ? { ...prev, ...fields } as BrandProfile : { user_id: "", id: "", created_at: "", updated_at: "", ...fields } as unknown as BrandProfile);
 
     try {
@@ -481,15 +480,11 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
       if (res.ok) {
         const updated = await res.json();
         setProfile(updated);
-      } else {
-        const errBody = await res.json().catch(() => ({}));
-        console.error("Profile save failed:", res.status, errBody);
-        // Keep optimistic value visible — don't revert to stale initialProfile
       }
-    } catch (err) {
-      console.error("Profile save error:", err);
+    } catch {
+      // Silent fail — optimistic update remains
     }
-  }, [profile]);
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Story CRUD

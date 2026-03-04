@@ -1,24 +1,50 @@
 export function ViralityBadge({ score }: { score: number | null }) {
   if (score === null || score === undefined) {
     return (
-      <span className="inline-flex items-center rounded-full bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-400">
+      <span
+        className="inline-flex items-center rounded-full px-2 py-0.5"
+        style={{
+          background: "#1A1A1A",
+          color: "#555",
+          fontFamily: "'JetBrains Mono', var(--font-mono)",
+          fontSize: "11px",
+          fontWeight: 600,
+        }}
+      >
         N/A
       </span>
     );
   }
 
-  let colorClasses: string;
+  let borderColor: string;
+  let bgColor: string;
+  let textColor: string;
+
   if (score >= 70) {
-    colorClasses = "bg-green-500/20 text-green-400";
+    borderColor = "rgba(255, 45, 45, 0.3)";
+    bgColor = "rgba(255, 45, 45, 0.15)";
+    textColor = "#FF2D2D";
   } else if (score >= 40) {
-    colorClasses = "bg-yellow-500/20 text-yellow-400";
+    borderColor = "rgba(161, 161, 161, 0.3)";
+    bgColor = "rgba(161, 161, 161, 0.1)";
+    textColor = "#A1A1A1";
   } else {
-    colorClasses = "bg-red-500/20 text-red-400";
+    borderColor = "rgba(107, 107, 107, 0.3)";
+    bgColor = "rgba(107, 107, 107, 0.1)";
+    textColor = "#6B6B6B";
   }
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold ${colorClasses}`}
+      className="inline-flex items-center rounded-full px-2 py-0.5"
+      style={{
+        border: `1px solid ${borderColor}`,
+        background: bgColor,
+        color: textColor,
+        fontFamily: "'JetBrains Mono', var(--font-mono)",
+        fontSize: "11px",
+        fontWeight: 600,
+      }}
     >
       {Math.round(score)}
     </span>

@@ -52,22 +52,25 @@ export async function updateSession(request: NextRequest) {
   // Brand profile onboarding redirect for authenticated dashboard users
   if (user && pathname.startsWith("/dashboard")) {
     const isOnboarding = pathname === "/dashboard/onboarding";
+    const isReset = request.nextUrl.searchParams.get("reset") === "true";
 
     const { data: profile } = await supabase
       .from("brand_profiles")
-      .select("id")
+      .select("id, onboarding_completed_at")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    // No profile and not on onboarding -> redirect to onboarding
-    if (!profile && !isOnboarding) {
+    const onboardingDone = !!profile?.onboarding_completed_at;
+
+    // No completed onboarding and not on onboarding page -> redirect to onboarding
+    if (!onboardingDone && !isOnboarding) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard/onboarding";
       return NextResponse.redirect(url);
     }
 
-    // Has profile and on onboarding -> redirect to dashboard
-    if (profile && isOnboarding) {
+    // Completed onboarding and on onboarding page (without reset) -> redirect to dashboard
+    if (onboardingDone && isOnboarding && !isReset) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);

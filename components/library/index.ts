@@ -7,3 +7,5 @@ export { EmptyState } from "./empty-state";
 export { PlatformIcon, PlatformBadge } from "./platform-icon";
 export { ViralityBadge } from "./virality-badge";
 export { TagChip } from "./tag-chip";
+export { ContentTypeBadge } from "./content-type-badge";
+export { CollectionsView } from "./collections-view";

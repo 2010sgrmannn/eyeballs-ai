@@ -1,30 +1,115 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { spawn, execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { writeFile, unlink, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import type {
   ContentItem,
   AnalysisResult,
   CreatorInfo,
 } from "@/types/content";
 
+const execFileAsync = promisify(execFile);
 const MAX_CONCURRENT = 5;
 
 /**
+ * Download a video from URL to a temp file. Returns the file path.
+ */
+async function downloadVideo(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download video: ${res.status}`);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const tmpPath = join(tmpdir(), `eyeballs-${randomUUID()}.mp4`);
+  await writeFile(tmpPath, buffer);
+  return tmpPath;
+}
+
+/**
+ * Extract audio from a video file using ffmpeg. Returns path to .mp3 file.
+ */
+async function extractAudio(videoPath: string): Promise<string> {
+  const audioPath = videoPath.replace(".mp4", ".mp3");
+  await execFileAsync("/opt/homebrew/bin/ffmpeg", [
+    "-i", videoPath,
+    "-vn",
+    "-acodec", "libmp3lame",
+    "-q:a", "4",
+    "-y",
+    audioPath,
+  ], { timeout: 30_000 });
+  return audioPath;
+}
+
+/**
+ * Transcribe audio using OpenAI Whisper API.
+ * Returns the word-for-word transcript.
+ */
+async function transcribeAudio(audioPath: string): Promise<string> {
+  const OpenAI = (await import("openai")).default;
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  const audioFile = await readFile(audioPath);
+  const file = new File([audioFile], "audio.mp3", { type: "audio/mpeg" });
+
+  const transcription = await client.audio.transcriptions.create({
+    model: "whisper-1",
+    file,
+    response_format: "text",
+  });
+
+  return typeof transcription === "string"
+    ? transcription
+    : (transcription as unknown as { text: string }).text;
+}
+
+/**
+ * Download video, extract audio, and transcribe with Whisper.
+ * Returns the word-for-word transcript or empty string on failure.
+ */
+export async function getVideoTranscript(mediaUrl: string | null): Promise<string> {
+  if (!mediaUrl) return "";
+  if (!process.env.OPENAI_API_KEY) return "";
+
+  let videoPath = "";
+  let audioPath = "";
+
+  try {
+    videoPath = await downloadVideo(mediaUrl);
+    audioPath = await extractAudio(videoPath);
+    const transcript = await transcribeAudio(audioPath);
+    return transcript.trim();
+  } catch (err) {
+    console.error("Transcription failed:", err instanceof Error ? err.message : err);
+    return "";
+  } finally {
+    if (videoPath) await unlink(videoPath).catch(() => {});
+    if (audioPath) await unlink(audioPath).catch(() => {});
+  }
+}
+
+/**
  * Build the analysis prompt for a single content item.
+ * Now receives the actual word-for-word transcript from Whisper.
  */
 export function buildAnalysisPrompt(
   item: ContentItem,
-  creator: CreatorInfo
+  creator: CreatorInfo,
+  whisperTranscript: string
 ): string {
   const parts: string[] = [];
-  parts.push("Analyze the following social media content and return JSON.");
+  parts.push("You are a social media content analyst. Study EVERYTHING about this content deeply - the caption, the spoken transcript, the platform, the engagement data, the creator context. Your job is to extract maximum insight and tag it thoroughly.");
   parts.push("");
 
   if (item.platform) parts.push(`Platform: ${item.platform}`);
   if (item.content_type) parts.push(`Content type: ${item.content_type}`);
-  if (item.caption) parts.push(`Caption: ${item.caption}`);
-  if (item.transcript) parts.push(`Existing transcript: ${item.transcript}`);
+  if (item.caption) parts.push(`\nFull Caption:\n${item.caption}`);
 
-  parts.push("");
-  parts.push("Engagement data:");
+  if (whisperTranscript) {
+    parts.push(`\nWord-for-word audio transcript (what is spoken in the video):\n${whisperTranscript}`);
+  }
+
+  parts.push("\nEngagement data:");
   if (item.view_count != null) parts.push(`  Views: ${item.view_count}`);
   if (item.like_count != null) parts.push(`  Likes: ${item.like_count}`);
   if (item.comment_count != null)
@@ -38,26 +123,35 @@ export function buildAnalysisPrompt(
   parts.push("");
   parts.push("Return ONLY valid JSON (no markdown, no code fences) with this exact structure:");
   parts.push(`{
-  "transcript": "A descriptive transcript or summary of the content",
   "hook_text": "The opening hook - the first line or sentence that grabs attention",
   "cta_text": "The call-to-action, or empty string if none",
   "virality_score": 50,
   "tags": [
-    { "tag": "example", "category": "niche" },
-    { "tag": "example", "category": "topic" },
-    { "tag": "example", "category": "style" },
-    { "tag": "example", "category": "hook_type" },
-    { "tag": "example", "category": "emotion" }
+    { "tag": "fitness", "category": "niche" },
+    { "tag": "body transformation", "category": "topic" },
+    { "tag": "weight loss", "category": "topic" },
+    { "tag": "talking head", "category": "style" },
+    { "tag": "before and after", "category": "style" },
+    { "tag": "challenge hook", "category": "hook_type" },
+    { "tag": "motivation", "category": "emotion" },
+    { "tag": "curiosity", "category": "emotion" }
   ]
 }`);
   parts.push("");
-  parts.push("Rules:");
-  parts.push("- transcript: Generate a descriptive transcript from the caption and context. If no caption, write a brief content description.");
-  parts.push("- hook_text: The opening hook that grabs attention. Extract from the first line of caption if available.");
+  parts.push("TAGGING RULES - be thorough:");
+  parts.push("- Study the caption word by word, the transcript, and all context clues");
+  parts.push("- niche: The broad content niche (fitness, business, tech, lifestyle, etc). Usually 1-2 tags.");
+  parts.push("- topic: Specific topics covered. Be detailed. 2-5 tags. Examples: 'body recomposition', 'meal prep', 'client transformation', 'gym tips', 'supplement review'");
+  parts.push("- style: Visual/content format. 2-3 tags. Examples: 'talking head', 'before and after', 'tutorial', 'montage', 'text overlay', 'lifestyle vlog', 'POV', 'skit', 'carousel', 'voiceover'");
+  parts.push("- hook_type: How it grabs attention. 1-2 tags. Examples: 'challenge hook', 'controversial take', 'question hook', 'story hook', 'shock value', 'number list', 'bold claim', 'relatable pain point'");
+  parts.push("- emotion: What emotions it triggers. 1-3 tags. Examples: 'motivation', 'curiosity', 'FOMO', 'humor', 'inspiration', 'urgency', 'trust', 'aspiration'");
+  parts.push("- Use lowercase tags. Be specific rather than generic.");
+  parts.push("- Generate 8-15 total tags across all categories.");
+  parts.push("");
+  parts.push("OTHER RULES:");
+  parts.push("- hook_text: Extract the exact opening hook from the first line of caption. If caption starts with emoji, include it.");
   parts.push("- cta_text: The call-to-action. Empty string if none found.");
-  parts.push("- virality_score: 0-100 integer based on engagement ratio relative to follower count, hook strength, and content structure.");
-  parts.push("- tags: Include at least one tag per category (niche, topic, style, hook_type, emotion).");
-  parts.push("- category must be one of: niche, topic, style, hook_type, emotion");
+  parts.push("- virality_score: 0-100 integer. Consider: engagement ratio vs follower count, hook strength, content structure, shareability, emotional pull.");
 
   return parts.join("\n");
 }
@@ -66,11 +160,17 @@ export function buildAnalysisPrompt(
  * Parse the Claude API response into an AnalysisResult.
  * Throws if the response is not valid JSON or missing required fields.
  */
-export function parseAnalysisResponse(raw: string): AnalysisResult {
+export function parseAnalysisResponse(raw: string, whisperTranscript: string): AnalysisResult {
   // Strip markdown code fences if present
   let cleaned = raw.trim();
   if (cleaned.startsWith("```")) {
     cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
+  }
+
+  // Try to extract JSON from the response if there's extra text
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    cleaned = jsonMatch[0];
   }
 
   let parsed: unknown;
@@ -87,9 +187,6 @@ export function parseAnalysisResponse(raw: string): AnalysisResult {
   const obj = parsed as Record<string, unknown>;
 
   // Validate required fields
-  if (typeof obj.transcript !== "string") {
-    throw new Error("Missing or invalid 'transcript' in analysis response");
-  }
   if (typeof obj.hook_text !== "string") {
     throw new Error("Missing or invalid 'hook_text' in analysis response");
   }
@@ -122,7 +219,7 @@ export function parseAnalysisResponse(raw: string): AnalysisResult {
     });
 
   return {
-    transcript: obj.transcript,
+    transcript: whisperTranscript,
     hook_text: obj.hook_text,
     cta_text: obj.cta_text,
     virality_score: Math.round(obj.virality_score),
@@ -131,16 +228,19 @@ export function parseAnalysisResponse(raw: string): AnalysisResult {
 }
 
 /**
- * Analyze a single content item using the Claude API.
+ * Analyze a single content item using the Claude API (requires ANTHROPIC_API_KEY).
  */
 export async function analyzeContent(
-  client: Anthropic,
+  client: unknown,
   item: ContentItem,
-  creator: CreatorInfo
+  creator: CreatorInfo,
+  whisperTranscript: string
 ): Promise<AnalysisResult> {
-  const prompt = buildAnalysisPrompt(item, creator);
+  const Anthropic = (await import("@anthropic-ai/sdk")).default;
+  const anthropicClient = client as InstanceType<typeof Anthropic>;
+  const prompt = buildAnalysisPrompt(item, creator, whisperTranscript);
 
-  const message = await client.messages.create({
+  const message = await anthropicClient.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
     messages: [{ role: "user", content: prompt }],
@@ -151,7 +251,69 @@ export async function analyzeContent(
     throw new Error("No text response from Claude API");
   }
 
-  return parseAnalysisResponse(textBlock.text);
+  return parseAnalysisResponse(textBlock.text, whisperTranscript);
+}
+
+/**
+ * Run the local `claude` CLI using spawn (not execFile) to avoid stdin hanging.
+ * Returns the stdout text.
+ */
+function runClaudeCli(prompt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const env = { ...process.env, TERM: "dumb" };
+    for (const key of Object.keys(env)) {
+      if (key === "CLAUDECODE" || key.startsWith("CLAUDE_CODE_")) {
+        delete (env as Record<string, unknown>)[key];
+      }
+    }
+
+    const child = spawn(
+      "/Users/sergiotosa/.local/bin/claude",
+      ["-p", prompt, "--output-format", "text"],
+      {
+        env: env as NodeJS.ProcessEnv,
+        stdio: ["ignore", "pipe", "pipe"],
+      }
+    );
+
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d: Buffer) => { stdout += d.toString(); });
+    child.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+
+    const timer = setTimeout(() => {
+      child.kill();
+      reject(new Error("Claude CLI timed out after 120s"));
+    }, 120_000);
+
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (code === 0) {
+        resolve(stdout);
+      } else {
+        reject(new Error(`Claude CLI exited with code ${code}: ${stderr.slice(0, 200)}`));
+      }
+    });
+
+    child.on("error", (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+/**
+ * Analyze a single content item using the local `claude` CLI (uses Max subscription).
+ * Falls back to this when no ANTHROPIC_API_KEY is set.
+ */
+export async function analyzeContentLocal(
+  item: ContentItem,
+  creator: CreatorInfo,
+  whisperTranscript: string
+): Promise<AnalysisResult> {
+  const prompt = buildAnalysisPrompt(item, creator, whisperTranscript);
+  const stdout = await runClaudeCli(prompt);
+  return parseAnalysisResponse(stdout, whisperTranscript);
 }
 
 /**
@@ -187,14 +349,14 @@ export async function analyzeContentBatch<T>(
 }
 
 /**
- * Create an Anthropic client. Throws if ANTHROPIC_API_KEY is not set.
+ * Create an Anthropic client. Returns null if no API key is configured.
  */
-export function createAnthropicClient(): Anthropic {
+export function createAnthropicClient(): unknown | null {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY environment variable is required for content analysis"
-    );
+  if (!apiKey || apiKey.includes("placeholder")) {
+    return null;
   }
+  // Dynamic import to avoid bundling issues
+  const Anthropic = require("@anthropic-ai/sdk").default;
   return new Anthropic({ apiKey });
 }

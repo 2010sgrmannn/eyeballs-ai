@@ -23,6 +23,7 @@ export interface ScrapedPost {
   commentCount: number;
   shareCount: number;
   postedAt: string;
+  carouselUrls?: string[];
 }
 
 /** Creator record as stored in the database */

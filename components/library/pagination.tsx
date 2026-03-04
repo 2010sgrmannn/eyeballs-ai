@@ -17,7 +17,6 @@ export function Pagination({
 
   if (totalPages <= 1) return null;
 
-  // Show at most 7 page buttons with ellipsis
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
@@ -26,14 +25,26 @@ export function Pagination({
         type="button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="rounded-md border border-neutral-800 px-3 py-1.5 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+        className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:bg-[#161616] disabled:cursor-not-allowed disabled:opacity-30"
+        style={{
+          border: "1px solid #1F1F1F",
+          background: "#1A1A1A",
+          color: "#888",
+          fontFamily: "var(--font-body)",
+          fontSize: "12px",
+          fontWeight: 500,
+        }}
       >
         Prev
       </button>
 
       {pages.map((p, i) =>
         p === null ? (
-          <span key={`ellipsis-${i}`} className="px-2 text-neutral-600">
+          <span
+            key={`ellipsis-${i}`}
+            className="px-2"
+            style={{ color: "#555", fontFamily: "var(--font-mono)" }}
+          >
             ...
           </span>
         ) : (
@@ -41,11 +52,14 @@ export function Pagination({
             key={p}
             type="button"
             onClick={() => onPageChange(p)}
-            className={`rounded-md px-3 py-1.5 text-sm ${
-              p === currentPage
-                ? "bg-white font-medium text-neutral-950"
-                : "border border-neutral-800 text-neutral-400 hover:bg-neutral-800 hover:text-white"
-            }`}
+            className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200"
+            style={{
+              border: p === currentPage ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+              background: p === currentPage ? "#FF2D2D" : "#111",
+              color: p === currentPage ? "#FFFFFF" : "#888",
+              fontFamily: "var(--font-mono)",
+              fontWeight: p === currentPage ? 600 : 400,
+            }}
           >
             {p}
           </button>
@@ -56,7 +70,15 @@ export function Pagination({
         type="button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="rounded-md border border-neutral-800 px-3 py-1.5 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+        className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:bg-[#161616] disabled:cursor-not-allowed disabled:opacity-30"
+        style={{
+          border: "1px solid #1F1F1F",
+          background: "#1A1A1A",
+          color: "#888",
+          fontFamily: "var(--font-body)",
+          fontSize: "12px",
+          fontWeight: 500,
+        }}
       >
         Next
       </button>

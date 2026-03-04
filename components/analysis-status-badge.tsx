@@ -5,11 +5,6 @@ interface AnalysisStatusBadgeProps {
   viralityScore?: number | null;
 }
 
-/**
- * Displays analysis status on content cards.
- * Shows "Pending" (yellow) when not yet analyzed, or "Analyzed" (green) with
- * optional virality score when analysis is complete.
- */
 export function AnalysisStatusBadge({
   analyzedAt,
   viralityScore,
@@ -18,9 +13,18 @@ export function AnalysisStatusBadge({
     return (
       <span
         data-testid="analysis-status-pending"
-        className="inline-flex items-center gap-1 rounded-full bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-400"
+        className="inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 text-xs font-medium"
+        style={{
+          border: "1px solid rgba(251, 191, 36, 0.3)",
+          background: "rgba(251, 191, 36, 0.08)",
+          color: "#FBBF24",
+          fontFamily: "var(--font-mono)",
+        }}
       >
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-400" />
+        <span
+          className="inline-block h-1.5 w-1.5 rounded-full"
+          style={{ background: "#FBBF24" }}
+        />
         Pending
       </span>
     );
@@ -29,12 +33,21 @@ export function AnalysisStatusBadge({
   return (
     <span
       data-testid="analysis-status-analyzed"
-      className="inline-flex items-center gap-1 rounded-full bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-400"
+      className="inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 text-xs font-medium"
+      style={{
+        border: "1px solid rgba(52, 211, 153, 0.3)",
+        background: "rgba(52, 211, 153, 0.08)",
+        color: "#34D399",
+        fontFamily: "var(--font-mono)",
+      }}
     >
-      <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" />
+      <span
+        className="inline-block h-1.5 w-1.5 rounded-full"
+        style={{ background: "#34D399" }}
+      />
       Analyzed
       {viralityScore != null && (
-        <span className="ml-1 text-green-300">({viralityScore})</span>
+        <span style={{ color: "#34D399", opacity: 0.7 }}>({viralityScore})</span>
       )}
     </span>
   );

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { after } from "next/server";
 import { calculateEngagementRatio } from "@/services/scraper";
 import {
   mapApifyPostToScrapedPost,
@@ -6,6 +7,7 @@ import {
 } from "@/services/apify-mapper";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 120;
 
 // ---------------------------------------------------------------------------
 // POST /api/onboarding/scrape
@@ -97,18 +99,22 @@ export async function POST(request: Request) {
     );
   }
 
-  // Fire-and-forget — scraping continues after response is sent
-  scrapeAllHandles(job.id, user.id, allHandles).catch(async (err) => {
-    console.error("[onboarding/scrape] scrapeAllHandles fatal error:", err);
-    const sb = await createClient();
-    await sb
-      .from("scrape_jobs")
-      .update({
-        status: "error",
-        errors: [...(job.errors || []), err instanceof Error ? err.message : String(err)],
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", job.id);
+  // Use after() to keep the serverless function alive after response is sent
+  after(async () => {
+    try {
+      await scrapeAllHandles(job.id, user.id, allHandles);
+    } catch (err) {
+      console.error("[onboarding/scrape] scrapeAllHandles fatal error:", err);
+      const sb = await createClient();
+      await sb
+        .from("scrape_jobs")
+        .update({
+          status: "error",
+          errors: [...(job.errors || []), err instanceof Error ? err.message : String(err)],
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", job.id);
+    }
   });
 
   return new Response(
@@ -206,46 +212,63 @@ async function scrapeHandle(
   const client = new ApifyClient({ token });
   const profileUrl = `https://www.instagram.com/${handle}/`;
 
-  const profileRun = await client
-    .actor("apify/instagram-api-scraper")
-    .call({
-      directUrls: [profileUrl],
-      resultsType: "details",
-      resultsLimit: 1,
-    });
+  // Fetch profile (non-critical — don't fail the whole scrape if this errors)
+  try {
+    const profileRun = await client
+      .actor("apify/instagram-api-scraper")
+      .call({
+        directUrls: [profileUrl],
+        resultsType: "details",
+        resultsLimit: 1,
+      }, { timeout: 30 });
 
-  const profileItems = await client
-    .dataset(profileRun.defaultDatasetId)
-    .listItems();
+    const profileItems = await client
+      .dataset(profileRun.defaultDatasetId)
+      .listItems();
 
-  const profile = profileItems.items[0] as Record<string, unknown> | undefined;
-  const { displayName, followerCount } = mapApifyProfile(profile, handle);
+    const profile = profileItems.items[0] as Record<string, unknown> | undefined;
+    const { displayName, followerCount } = mapApifyProfile(profile, handle);
 
-  // Update creator with profile metadata
-  await supabase
-    .from("creators")
-    .update({
-      display_name: displayName,
-      follower_count: followerCount,
-      scraped_at: new Date().toISOString(),
-    })
-    .eq("id", creator.id);
+    await supabase
+      .from("creators")
+      .update({
+        display_name: displayName,
+        follower_count: followerCount,
+        scraped_at: new Date().toISOString(),
+      })
+      .eq("id", creator.id);
+  } catch (profileErr) {
+    console.error(`[scrape] Profile fetch failed for @${handle}:`, profileErr);
+    // Continue — posts are more important than profile metadata
+  }
 
-  // 3. Fetch posts (enough to build Brand DNA from captions)
-  const depth = 15;
-  const postsRun = await client
-    .actor("apify/instagram-api-scraper")
-    .call({
-      directUrls: [profileUrl],
-      resultsType: "posts",
-      resultsLimit: depth,
-    });
+  // 3. Fetch posts & reels — limit to 10 for onboarding (Apify free tier is slow)
+  // Instagram rate-limits heavily; ~1 post per 30-40s on free proxies
+  const depth = 10;
+  let rawPosts: Record<string, unknown>[] = [];
 
-  const postsItems = await client
-    .dataset(postsRun.defaultDatasetId)
-    .listItems();
+  try {
+    console.log(`[scrape] Starting Apify posts fetch for @${handle}, depth=${depth}`);
+    const postsRun = await client
+      .actor("apify/instagram-api-scraper")
+      .call({
+        directUrls: [profileUrl],
+        resultsType: "posts",
+        resultsLimit: depth,
+      }, { timeout: 90 });
 
-  const rawPosts = postsItems.items as Record<string, unknown>[];
+    const postsItems = await client
+      .dataset(postsRun.defaultDatasetId)
+      .listItems();
+
+    rawPosts = postsItems.items as Record<string, unknown>[];
+    console.log(`[scrape] Apify returned ${rawPosts.length} items for @${handle}`);
+  } catch (postsErr) {
+    console.error(`[scrape] Apify posts fetch FAILED for @${handle}:`, postsErr);
+    throw new Error(
+      `Apify scrape failed for @${handle}: ${postsErr instanceof Error ? postsErr.message : String(postsErr)}`
+    );
+  }
 
   // 4. Map posts using the shared mapper
   const contentRows = rawPosts.map((item, i) => {
@@ -282,9 +305,10 @@ async function scrapeHandle(
         `Failed to save content for @${handle}: ${contentError.message}`
       );
     }
+    console.log(`[scrape] Saved ${contentRows.length} content rows for @${handle}`);
   }
 
-  // 6. Update job progress in DB
+  // 6. Update job progress atomically using RPC or read-then-write
   const { data: current } = await supabase
     .from("scrape_jobs")
     .select("handles_completed, posts_found, creators_processed")

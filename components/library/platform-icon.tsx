@@ -1,12 +1,5 @@
 import type { Platform } from "@/types/database";
 
-const PLATFORM_COLORS: Record<Platform, string> = {
-  instagram: "bg-gradient-to-br from-purple-500 to-pink-500",
-  tiktok: "bg-neutral-800",
-  linkedin: "bg-blue-700",
-  twitter: "bg-sky-500",
-};
-
 const PLATFORM_LABELS: Record<Platform, string> = {
   instagram: "IG",
   tiktok: "TT",
@@ -17,7 +10,13 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 export function PlatformIcon({ platform }: { platform: Platform }) {
   return (
     <span
-      className={`inline-flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold text-white ${PLATFORM_COLORS[platform] ?? "bg-neutral-700"}`}
+      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-semibold"
+      style={{
+        border: "1px solid #1F1F1F",
+        background: "#161616",
+        color: "#888",
+        fontFamily: "var(--font-body)",
+      }}
     >
       {PLATFORM_LABELS[platform] ?? "?"}
     </span>
@@ -27,10 +26,18 @@ export function PlatformIcon({ platform }: { platform: Platform }) {
 export function PlatformBadge({ platform }: { platform: Platform }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white ${PLATFORM_COLORS[platform] ?? "bg-neutral-700"}`}
+      className="inline-flex items-center gap-1 rounded-md px-2 py-0.5"
+      style={{
+        border: "1px solid #1F1F1F",
+        background: "#161616",
+        color: "#888",
+        fontFamily: "var(--font-body)",
+        fontSize: "11px",
+        fontWeight: 500,
+        textTransform: "capitalize",
+      }}
     >
-      {PLATFORM_LABELS[platform] ?? platform}
-      <span className="capitalize">{platform}</span>
+      {platform}
     </span>
   );
 }

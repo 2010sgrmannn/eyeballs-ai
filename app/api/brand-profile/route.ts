@@ -15,7 +15,7 @@ export async function GET() {
     .from("brand_profiles")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (error || !profile) {
     return NextResponse.json(null, { status: 200 });
@@ -68,7 +68,6 @@ export async function PUT(request: NextRequest) {
     .maybeSingle();
 
   if (updateError) {
-    console.error("brand-profile UPDATE failed:", updateError);
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
@@ -85,7 +84,6 @@ export async function PUT(request: NextRequest) {
     .single();
 
   if (insertError) {
-    console.error("brand-profile INSERT failed:", insertError);
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 

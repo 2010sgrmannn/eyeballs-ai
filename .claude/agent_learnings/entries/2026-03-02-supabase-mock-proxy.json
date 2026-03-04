@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-03-02T00:00:00Z",
+  "category": "technical-gotcha",
+  "summary": "Supabase query builder mocks must use Proxy pattern for full chainability",
+  "detail": "When mocking Supabase's query builder (from/select/eq/is/in/order/limit chains) in bun:test, avoid plain objects with mock functions for each method. The `is` and `in` keywords conflict with JS, and methods like `.limit()` must return chainable objects since Supabase allows any ordering. Use a JS Proxy that returns itself for all method calls except terminal ones (limit returns Promise). Also, `.limit()` should be called last in the actual code since it acts as the terminal/await point.",
+  "repo": "eyeballs-ai",
+  "agent": "dev-agent",
+  "issue": 46
+}

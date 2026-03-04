@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-03-02T00:00:00Z",
+  "category": "technical-gotcha",
+  "summary": "gh pr merge fails inside worktrees because it tries to checkout main locally",
+  "details": "When running `gh pr merge` from a worktree, it fails with 'main is already used by worktree'. Use the GitHub API directly instead: `gh api repos/OWNER/REPO/pulls/N/merge -X PUT -f merge_method=squash`.",
+  "source_issue": 46,
+  "agent": "merge"
+}

@@ -20,7 +20,23 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={loading}
-      className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+      className="px-3 py-1.5 text-sm rounded-lg disabled:cursor-not-allowed disabled:opacity-50"
+      style={{
+        border: "1px solid #333333",
+        color: "#A1A1A1",
+        fontFamily: "var(--font-body)",
+        fontSize: "13px",
+        fontWeight: 500,
+        transition: "all 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "#FF2D2D";
+        e.currentTarget.style.color = "#FAFAFA";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "#333333";
+        e.currentTarget.style.color = "#A1A1A1";
+      }}
     >
       {loading ? "Logging out..." : "Log out"}
     </button>

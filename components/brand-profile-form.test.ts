@@ -1,9 +1,11 @@
 import { describe, it, expect } from "bun:test";
 import type { BrandProfileFormData } from "@/types/brand-profile";
+import { DEFAULT_FORM_DATA } from "@/types/brand-profile";
 
 describe("BrandProfileFormData validation", () => {
   it("accepts valid complete form data", () => {
     const data: BrandProfileFormData = {
+      ...DEFAULT_FORM_DATA,
       niche: "Fitness",
       brand_voice: "I talk like a coach",
       values: ["Authenticity", "Hustle"],
@@ -18,13 +20,7 @@ describe("BrandProfileFormData validation", () => {
   });
 
   it("allows empty initial state", () => {
-    const data: BrandProfileFormData = {
-      niche: "",
-      brand_voice: "",
-      values: [],
-      target_audience: "",
-      content_style: "",
-    };
+    const data: BrandProfileFormData = { ...DEFAULT_FORM_DATA };
 
     expect(data.niche).toBe("");
     expect(data.values).toHaveLength(0);
@@ -32,6 +28,7 @@ describe("BrandProfileFormData validation", () => {
 
   it("allows custom niche values", () => {
     const data: BrandProfileFormData = {
+      ...DEFAULT_FORM_DATA,
       niche: "Underwater Basket Weaving",
       brand_voice: "Calm and instructional",
       values: ["Creativity"],
@@ -44,6 +41,7 @@ describe("BrandProfileFormData validation", () => {
 
   it("allows multiple custom values", () => {
     const data: BrandProfileFormData = {
+      ...DEFAULT_FORM_DATA,
       niche: "Tech",
       brand_voice: "Direct and technical",
       values: ["Authenticity", "CustomValue1", "CustomValue2"],

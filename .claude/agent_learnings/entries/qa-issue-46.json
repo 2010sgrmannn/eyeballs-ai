@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-03-02T00:00:00Z",
+  "category": "technical-gotcha",
+  "agent": "qa",
+  "issue": 46,
+  "summary": "bun is installed at ~/.bun/bin/bun and not on default PATH in agent shells. Must prepend PATH=$HOME/.bun/bin:$PATH before bun commands.",
+  "details": "The bun binary is not on the default PATH when running in agent context. Need to export PATH with ~/.bun/bin prefix."
+}

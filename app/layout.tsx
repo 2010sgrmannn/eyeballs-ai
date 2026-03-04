@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "eyeballs.ai",
-  description: "eyeballs.ai - AI-powered visual analysis",
+  title: "EYEBALLS.AI",
+  description: "EYEBALLS.AI - Turn viral content into your next script",
 };
 
 export default function RootLayout({
@@ -25,11 +14,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-white`}
-      >
+      <body className="antialiased">
         {children}
-        <Toaster theme="dark" position="bottom-right" />
+        <Toaster
+          theme="dark"
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#111111",
+              border: "1px solid #1F1F1F",
+              color: "#FAFAFA",
+              fontFamily: "Inter, sans-serif",
+              borderRadius: "8px",
+            },
+          }}
+        />
       </body>
     </html>
   );

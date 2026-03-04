@@ -46,6 +46,7 @@ export async function POST(request: Request) {
     .select("caption, like_count, comment_count, view_count, engagement_ratio, posted_at")
     .eq("user_id", user.id)
     .not("caption", "is", null)
+    .neq("caption", "")
     .order("posted_at", { ascending: false })
     .limit(15);
 

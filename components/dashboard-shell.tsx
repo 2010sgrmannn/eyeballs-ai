@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { MobileMenu } from "./mobile-menu";
@@ -42,18 +41,7 @@ export function DashboardShell({ userEmail, children }: DashboardShellProps) {
           <div className="ambient-orb ambient-orb-purple" />
           <div className="ambient-orb ambient-orb-cyan" />
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={undefined}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="h-full"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          {children}
         </main>
       </div>
     </div>

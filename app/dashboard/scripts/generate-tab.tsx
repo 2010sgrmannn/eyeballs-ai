@@ -98,20 +98,45 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
     }
   }
 
+  const inputStyle = {
+    border: "1px solid #1F1F1F",
+    background: "#111111",
+    color: "#FAFAFA",
+    fontFamily: "var(--font-body)",
+    fontSize: "14px",
+    transition: "border-color 0.2s",
+  };
+
+  const labelStyle = {
+    fontFamily: "var(--font-body)",
+    fontSize: "12px",
+    color: "#6B6B6B",
+    fontWeight: 500 as const,
+    letterSpacing: "0.5px",
+    textTransform: "uppercase" as const,
+  };
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div
             role="alert"
-            className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+            className="px-4 py-3 rounded-lg"
+            style={{
+              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "rgba(239, 68, 68, 0.08)",
+              color: "#EF4444",
+              fontFamily: "var(--font-body)",
+              fontSize: "13px",
+            }}
           >
             {error}
           </div>
         )}
 
         <div className="space-y-2">
-          <label htmlFor="topic" className="block text-sm font-medium">
+          <label htmlFor="topic" style={labelStyle}>
             What do you want to talk about?
           </label>
           <textarea
@@ -120,20 +145,22 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
             onChange={(e) => setTopic(e.target.value)}
             placeholder="e.g., 5 productivity tips that doubled my output as a solopreneur..."
             rows={3}
-            className="w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+            className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+            style={inputStyle}
           />
         </div>
 
         {niches.length > 0 && (
           <div className="space-y-2">
-            <label htmlFor="niche" className="block text-sm font-medium">
+            <label htmlFor="niche" style={labelStyle}>
               Niche (optional)
             </label>
             <select
               id="niche"
               value={nicheId}
               onChange={(e) => setNicheId(e.target.value)}
-              className="w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              style={inputStyle}
             >
               <option value="">All niches</option>
               {niches.map((n) => (
@@ -147,14 +174,15 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="platform" className="block text-sm font-medium">
+            <label htmlFor="platform" style={labelStyle}>
               Platform
             </label>
             <select
               id="platform"
               value={platform}
               onChange={(e) => setPlatform(e.target.value as Platform)}
-              className="w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              style={inputStyle}
             >
               {PLATFORMS.map((p) => (
                 <option key={p.value} value={p.value}>
@@ -165,14 +193,15 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="style" className="block text-sm font-medium">
-              Script Style
+            <label htmlFor="style" style={labelStyle}>
+              Script style
             </label>
             <select
               id="style"
               value={scriptStyle}
               onChange={(e) => setScriptStyle(e.target.value as ScriptStyle)}
-              className="w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm focus:border-neutral-600 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              style={inputStyle}
             >
               {STYLES.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -186,15 +215,28 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-white px-6 py-2 text-sm font-medium text-neutral-950 hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50"
+          className="px-6 py-2.5 rounded-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            border: "1px solid #FF2D2D",
+            background: "#FF2D2D",
+            color: "#FFFFFF",
+            fontFamily: "var(--font-body)",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
         >
-          {loading ? "Generating..." : "Generate Script"}
+          {loading ? "Generating..." : "Generate script"}
         </button>
       </form>
 
       {generatedScript && (
         <div className="mt-8">
-          <h2 className="mb-4 text-lg font-semibold">Generated Script</h2>
+          <h2
+            className="mb-4"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700, color: "#FAFAFA" }}
+          >
+            Generated Script
+          </h2>
           <ScriptDisplay
             script={generatedScript}
             onRegenerate={handleRegenerate}

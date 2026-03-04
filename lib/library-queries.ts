@@ -6,6 +6,7 @@ import type {
   ContentWithRelations,
   Creator,
   ContentTag,
+  Folder,
 } from "@/types/database";
 import { ITEMS_PER_PAGE } from "@/types/database";
 
@@ -61,6 +62,25 @@ export async function fetchLibraryContent(
   }
   if (filters.engagementMax < 100) {
     query = query.lte("engagement_ratio", filters.engagementMax);
+  }
+
+  // Favorites filter
+  if (filters.favoritesOnly) {
+    const favoriteIds = await fetchFavoritedContentIds(supabase);
+    const idArray = Array.from(favoriteIds);
+    if (idArray.length === 0) {
+      return { data: [], totalCount: 0 };
+    }
+    query = query.in("id", idArray);
+  }
+
+  // Folder filter
+  if (filters.folderId) {
+    const folderContentIds = await fetchFolderContentIds(supabase, filters.folderId);
+    if (folderContentIds.length === 0) {
+      return { data: [], totalCount: 0 };
+    }
+    query = query.in("id", folderContentIds);
   }
 
   // Date range
@@ -169,6 +189,60 @@ export async function fetchAvailableTags(
   }
 
   return unique;
+}
+
+/**
+ * Fetch all favorited content IDs for the current user.
+ */
+export async function fetchFavoritedContentIds(
+  supabase: SupabaseClient
+): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("content_id");
+
+  if (error) {
+    throw new Error(`Failed to fetch favorites: ${error.message}`);
+  }
+
+  return new Set((data ?? []).map((row) => row.content_id));
+}
+
+/**
+ * Fetch content IDs belonging to a specific folder.
+ */
+async function fetchFolderContentIds(
+  supabase: SupabaseClient,
+  folderId: string
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("folder_items")
+    .select("content_id")
+    .eq("folder_id", folderId);
+
+  if (error) {
+    throw new Error(`Failed to fetch folder items: ${error.message}`);
+  }
+
+  return (data ?? []).map((row) => row.content_id);
+}
+
+/**
+ * Fetch all folders for the current user.
+ */
+export async function fetchFolders(
+  supabase: SupabaseClient
+): Promise<Folder[]> {
+  const { data, error } = await supabase
+    .from("folders")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to fetch folders: ${error.message}`);
+  }
+
+  return (data ?? []) as Folder[];
 }
 
 /**

@@ -33,6 +33,7 @@ function mockContent(
     hook_text: "Did you know?",
     cta_text: "Follow for more",
     posted_at: "2026-01-15T12:00:00Z",
+    carousel_urls: null,
     analyzed_at: "2026-01-16T12:00:00Z",
     created_at: "2026-01-16T12:00:00Z",
     creators: {
