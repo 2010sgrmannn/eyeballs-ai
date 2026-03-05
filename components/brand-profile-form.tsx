@@ -38,6 +38,7 @@ interface BrandProfileFormProps {
   onAnalysisStart?: (handle: string) => void;
   startAtStep?: number;
   initialDnaData?: Partial<BrandProfileFormData>;
+  isAnalysisStarting?: boolean;
 }
 
 type AnalyzingPhase = "idle" | "scraping" | "transcribing" | "classifying" | "analyzing_dna" | "done" | "error";
@@ -447,7 +448,7 @@ function SpinnerIcon({ size = 18, color = "#00D4D4" }: { size?: number; color?: 
 // Main Component
 // ---------------------------------------------------------------------------
 
-export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtStep, initialDnaData }: BrandProfileFormProps) {
+export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtStep, initialDnaData, isAnalysisStarting }: BrandProfileFormProps) {
   const router = useRouter();
 
   // Step mapping: 0=Instagram, 1=About You, 2=Your Story, 3=Brand DNA, 4=Launch
@@ -1992,7 +1993,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={saving}
+                disabled={saving || isAnalysisStarting}
                 className="rounded-lg px-6 py-2 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/10 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
                   background: "#FF2D2D",
@@ -2002,7 +2003,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                   fontWeight: 600,
                 }}
               >
-                {saving ? "Saving..." : "Next"}
+                {isAnalysisStarting ? "Starting..." : saving ? "Saving..." : "Next"}
               </button>
             )}
           </div>

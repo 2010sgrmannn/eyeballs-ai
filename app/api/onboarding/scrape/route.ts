@@ -16,9 +16,10 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
@@ -308,18 +309,21 @@ async function scrapeHandle(
     console.log(`[scrape] Saved ${contentRows.length} content rows for @${handle}`);
   }
 
-  // 6. Update job progress atomically using RPC or read-then-write
+  // 6. Update job progress atomically using RPC to avoid race conditions
+  await supabase.rpc("increment_handles_completed", { p_job_id: jobId });
+  await supabase.rpc("increment_posts_found", { p_job_id: jobId, p_count: rawPosts.length });
+
+  // Append creator handle to the processed list (read-then-write is acceptable
+  // for the array since the increment is now atomic)
   const { data: current } = await supabase
     .from("scrape_jobs")
-    .select("handles_completed, posts_found, creators_processed")
+    .select("creators_processed")
     .eq("id", jobId)
     .single();
 
   await supabase
     .from("scrape_jobs")
     .update({
-      handles_completed: (current?.handles_completed ?? 0) + 1,
-      posts_found: (current?.posts_found ?? 0) + rawPosts.length,
       creators_processed: [...(current?.creators_processed ?? []), handle],
       updated_at: new Date().toISOString(),
     })

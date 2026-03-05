@@ -90,6 +90,7 @@ export function LibraryView({
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<FetchLibraryResult>(initialData);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedContent, setSelectedContent] =
     useState<ContentWithRelations | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
@@ -133,6 +134,7 @@ export function LibraryView({
       p: number
     ) => {
       setLoading(true);
+      setFetchError(null);
       try {
         const supabase = createClient();
         const data = await fetchLibraryContent(supabase, {
@@ -144,6 +146,7 @@ export function LibraryView({
         setResult(data);
       } catch (err) {
         console.error("Failed to fetch library content:", err);
+        setFetchError(err instanceof Error ? err.message : "Failed to load content");
       } finally {
         setLoading(false);
       }
@@ -534,6 +537,45 @@ export function LibraryView({
             </>
           )}
         </div>
+
+        {/* Error banner */}
+        {fetchError && (
+          <div
+            className="mb-4 flex items-center gap-3 rounded-lg border px-4 py-3"
+            style={{
+              background: "rgba(255, 45, 45, 0.05)",
+              border: "1px solid rgba(255, 45, 45, 0.2)",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#FF2D2D" }}>
+              {fetchError}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setFetchError(null);
+                fetchData(filters, sortField, sortDirection, page);
+              }}
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "12px",
+                color: "#888",
+                marginLeft: "auto",
+                cursor: "pointer",
+                background: "none",
+                border: "none",
+                textDecoration: "underline",
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Content */}
         {result.data.length === 0 && !loading ? (

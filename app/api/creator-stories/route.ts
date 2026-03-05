@@ -13,9 +13,10 @@ export async function GET() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,14 +37,28 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { title, content, emotion, category, time_period, sort_order } = body;
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const { title, content, emotion, category, time_period, sort_order } = body as {
+    title?: string;
+    content?: string;
+    emotion?: StoryEmotion;
+    category?: StoryCategory;
+    time_period?: string;
+    sort_order?: number;
+  };
 
   if (!title || typeof title !== "string" || !title.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -66,7 +81,7 @@ export async function POST(request: NextRequest) {
       content: content.trim(),
       emotion: emotion || null,
       category: category || null,
-      time_period: time_period?.trim() || null,
+      time_period: (time_period as string)?.trim() || null,
       sort_order: sort_order ?? 0,
     })
     .select()
@@ -83,14 +98,29 @@ export async function PUT(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { id, title, content, emotion, category, time_period, sort_order } = body;
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const { id, title, content, emotion, category, time_period, sort_order } = body as {
+    id?: string;
+    title?: string;
+    content?: string;
+    emotion?: StoryEmotion;
+    category?: StoryCategory;
+    time_period?: string;
+    sort_order?: number;
+  };
 
   if (!id) {
     return NextResponse.json({ error: "Story id is required" }, { status: 400 });
@@ -116,11 +146,11 @@ export async function PUT(request: NextRequest) {
   }
 
   const updates: Record<string, unknown> = {};
-  if (title !== undefined) updates.title = title.trim();
-  if (content !== undefined) updates.content = content.trim();
+  if (title !== undefined) updates.title = (title as string).trim();
+  if (content !== undefined) updates.content = (content as string).trim();
   if (emotion !== undefined) updates.emotion = emotion || null;
   if (category !== undefined) updates.category = category || null;
-  if (time_period !== undefined) updates.time_period = time_period?.trim() || null;
+  if (time_period !== undefined) updates.time_period = (time_period as string)?.trim() || null;
   if (sort_order !== undefined) updates.sort_order = sort_order;
 
   const { data, error } = await supabase
@@ -142,9 +172,10 @@ export async function DELETE(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

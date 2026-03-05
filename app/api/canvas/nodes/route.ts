@@ -14,9 +14,10 @@ export async function GET() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -37,16 +38,23 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
   const { node_type, position_x, position_y, width, height, data: nodeData, label } = body;
 
-  if (!node_type || !VALID_NODE_TYPES.includes(node_type)) {
+  if (!node_type || !VALID_NODE_TYPES.includes(node_type as CanvasNodeType)) {
     return NextResponse.json(
       { error: `node_type must be one of: ${VALID_NODE_TYPES.join(", ")}` },
       { status: 400 }
@@ -58,12 +66,12 @@ export async function POST(request: NextRequest) {
     .insert({
       user_id: user.id,
       node_type,
-      position_x: position_x ?? 0,
-      position_y: position_y ?? 0,
-      width: width ?? 280,
-      height: height ?? 200,
+      position_x: (position_x as number) ?? 0,
+      position_y: (position_y as number) ?? 0,
+      width: (width as number) ?? 280,
+      height: (height as number) ?? 200,
       data: nodeData ?? {},
-      label: label ?? null,
+      label: (label as string) ?? null,
     })
     .select()
     .single();
@@ -79,13 +87,20 @@ export async function PUT(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
   const { id, position_x, position_y, width, height, data: nodeData, label } = body;
 
   if (!id) {
@@ -95,7 +110,7 @@ export async function PUT(request: NextRequest) {
   const { data: existing } = await supabase
     .from("canvas_nodes")
     .select("id")
-    .eq("id", id)
+    .eq("id", id as string)
     .eq("user_id", user.id)
     .single();
 
@@ -114,7 +129,7 @@ export async function PUT(request: NextRequest) {
   const { data, error } = await supabase
     .from("canvas_nodes")
     .update(updates)
-    .eq("id", id)
+    .eq("id", id as string)
     .eq("user_id", user.id)
     .select()
     .single();
@@ -130,9 +145,10 @@ export async function DELETE(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
