@@ -70,12 +70,14 @@ export async function POST(request: Request) {
     );
   }
 
-  // Run analysis in background after response.
-  // The profile analyzer now uses a service-role Supabase client internally,
-  // so we no longer need to pass an access token.
+  // Capture access token as fallback for background job DB writes
+  // (used when SUPABASE_SERVICE_ROLE_KEY is not set)
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+
   after(async () => {
     try {
-      await runProfileAnalysis(job.id, user.id, handle, reelCount);
+      await runProfileAnalysis(job.id, user.id, handle, reelCount, accessToken ?? undefined);
     } catch (err) {
       console.error("[profile-analyzer/start] Fatal error:", err);
     }

@@ -49,11 +49,22 @@ interface ReelData {
 // Service-role Supabase client for background jobs
 // ---------------------------------------------------------------------------
 
-function createServiceRoleClient() {
-  return createJsClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+function createBackgroundClient(accessToken?: string) {
+  // Prefer service role key (no token expiry), fall back to user access token
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createJsClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+  if (accessToken) {
+    return createJsClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+    );
+  }
+  throw new Error("No SUPABASE_SERVICE_ROLE_KEY or accessToken available for background job");
 }
 
 // ---------------------------------------------------------------------------
@@ -308,10 +319,10 @@ Return ONLY valid JSON:
 // Job Status Updater
 // ---------------------------------------------------------------------------
 
-type SupabaseServiceClient = ReturnType<typeof createServiceRoleClient>;
+type SupabaseBackgroundClient = ReturnType<typeof createBackgroundClient>;
 
 async function updateJob(
-  supabase: SupabaseServiceClient,
+  supabase: SupabaseBackgroundClient,
   jobId: string,
   updates: Record<string, unknown>
 ) {
@@ -326,7 +337,7 @@ async function updateJob(
 }
 
 async function appendJobError(
-  supabase: SupabaseServiceClient,
+  supabase: SupabaseBackgroundClient,
   jobId: string,
   errorMsg: string
 ) {
@@ -352,10 +363,10 @@ export async function runProfileAnalysis(
   userId: string,
   handle: string,
   reelCount: number,
+  accessToken?: string,
 ) {
-  // Use service role client for background job DB writes.
-  // This avoids token expiry issues for long-running jobs.
-  const supabase = createServiceRoleClient();
+  // Prefer service role key (no token expiry), fall back to user access token
+  const supabase = createBackgroundClient(accessToken);
 
   // Wrap entire job in a timeout race
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -378,7 +389,7 @@ export async function runProfileAnalysis(
 }
 
 async function runProfileAnalysisInner(
-  supabase: SupabaseServiceClient,
+  supabase: SupabaseBackgroundClient,
   jobId: string,
   userId: string,
   handle: string,

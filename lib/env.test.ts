@@ -11,7 +11,7 @@ describe("validateEnv", () => {
     process.env.ANTHROPIC_API_KEY = "test-anthropic-key";
     process.env.OPENAI_API_KEY = "test-openai-key";
     process.env.APIFY_API_TOKEN = "test-apify-token";
-    process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
+    // SUPABASE_SERVICE_ROLE_KEY is optional — not set by default in tests
   });
 
   afterEach(() => {
