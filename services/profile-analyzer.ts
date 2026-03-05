@@ -1,4 +1,4 @@
-import { createClientWithToken } from "@/lib/supabase/server";
+import { createClient as createJsClient } from "@supabase/supabase-js";
 import { getAnthropicClient } from "@/lib/anthropic";
 import { calculateEngagementRatio } from "@/services/scraper";
 import {
@@ -17,6 +17,7 @@ import {
   GENDER_OPTIONS,
   CONTENT_GOAL_OPTIONS,
 } from "@/lib/constants/brand-profile-options";
+import { withRetry } from "@/lib/retry";
 import type { BrandDNAAnalysis } from "@/types/brand-profile";
 import type { ReelType, TagCategory } from "@/types/database";
 
@@ -45,7 +46,18 @@ interface ReelData {
 }
 
 // ---------------------------------------------------------------------------
-// Transcription — sends mp4 directly to Whisper (no ffmpeg)
+// Service-role Supabase client for background jobs
+// ---------------------------------------------------------------------------
+
+function createServiceRoleClient() {
+  return createJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Transcription -- sends mp4 directly to Whisper (no ffmpeg)
 // ---------------------------------------------------------------------------
 
 async function downloadToBuffer(url: string): Promise<Buffer> {
@@ -59,7 +71,10 @@ export async function transcribeVideoDirectly(
 ): Promise<string> {
   if (!process.env.OPENAI_API_KEY) return "";
 
-  const buffer = await downloadToBuffer(mediaUrl);
+  const buffer = await withRetry(
+    () => downloadToBuffer(mediaUrl),
+    { maxRetries: 2, backoffMs: 1000, label: "downloadToBuffer" }
+  );
   const file = new File([new Uint8Array(buffer)], "video.mp4", { type: "video/mp4" });
 
   const OpenAI = (await import("openai")).default;
@@ -77,7 +92,7 @@ export async function transcribeVideoDirectly(
 }
 
 // ---------------------------------------------------------------------------
-// Reel Classification — single Claude call per reel
+// Reel Classification -- single Claude call per reel
 // ---------------------------------------------------------------------------
 
 export async function classifyReel(
@@ -92,19 +107,19 @@ Caption:
 ${caption || "(no caption)"}
 
 Transcript (what is spoken in the video):
-${transcript || "(no speech detected — likely music/text overlay only)"}
+${transcript || "(no speech detected -- likely music/text overlay only)"}
 
 Determine the reel type based on these rules:
-- If transcript has substantial speech and appears to be someone talking to camera → "talking_head"
-- If transcript has speech but seems like narration over footage → "voiceover"
-- If transcript is empty/minimal and caption exists → "text_overlay_music"
-- If transcript mentions "watch this" or describes visual transitions → "transition"
-- If content is a step-by-step explanation → "tutorial"
-- If multiple speakers detected → "interview"
-- If content appears to be a comedy bit or acting → "skit"
-- If content shows a compilation of clips → "montage"
-- If content is reacting to something → "reaction"
-- Otherwise → "other"
+- If transcript has substantial speech and appears to be someone talking to camera -> "talking_head"
+- If transcript has speech but seems like narration over footage -> "voiceover"
+- If transcript is empty/minimal and caption exists -> "text_overlay_music"
+- If transcript mentions "watch this" or describes visual transitions -> "transition"
+- If content is a step-by-step explanation -> "tutorial"
+- If multiple speakers detected -> "interview"
+- If content appears to be a comedy bit or acting -> "skit"
+- If content shows a compilation of clips -> "montage"
+- If content is reacting to something -> "reaction"
+- Otherwise -> "other"
 
 Return ONLY valid JSON (no markdown fences):
 {
@@ -147,7 +162,21 @@ TAGGING RULES:
   const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
   if (jsonMatch) cleaned = jsonMatch[0];
 
-  const parsed = JSON.parse(cleaned) as ReelClassification;
+  let parsed: ReelClassification;
+  try {
+    parsed = JSON.parse(cleaned) as ReelClassification;
+  } catch (parseErr) {
+    console.error("[profile-analyzer] classifyReel JSON.parse failed. Raw response:", cleaned);
+    // Return a safe default classification
+    return {
+      reel_type: "other",
+      topics: [],
+      hook_text: "",
+      cta_text: "",
+      virality_score: 50,
+      tags: [],
+    };
+  }
 
   // Validate reel_type
   const validTypes: ReelType[] = [
@@ -170,7 +199,7 @@ TAGGING RULES:
 }
 
 // ---------------------------------------------------------------------------
-// Brand DNA Generation — one Claude call with ALL data
+// Brand DNA Generation -- one Claude call with ALL data
 // ---------------------------------------------------------------------------
 
 export async function generateBrandDNA(
@@ -267,15 +296,22 @@ Return ONLY valid JSON:
   const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
   if (jsonMatch) cleaned = jsonMatch[0];
 
-  return JSON.parse(cleaned) as BrandDNAAnalysis;
+  try {
+    return JSON.parse(cleaned) as BrandDNAAnalysis;
+  } catch (parseErr) {
+    console.error("[profile-analyzer] generateBrandDNA JSON.parse failed. Raw response:", cleaned);
+    throw new Error("Failed to parse Brand DNA response from Claude as JSON");
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Job Status Updater
 // ---------------------------------------------------------------------------
 
+type SupabaseServiceClient = ReturnType<typeof createServiceRoleClient>;
+
 async function updateJob(
-  supabase: ReturnType<typeof createClientWithToken>,
+  supabase: SupabaseServiceClient,
   jobId: string,
   updates: Record<string, unknown>
 ) {
@@ -290,7 +326,7 @@ async function updateJob(
 }
 
 async function appendJobError(
-  supabase: ReturnType<typeof createClientWithToken>,
+  supabase: SupabaseServiceClient,
   jobId: string,
   errorMsg: string
 ) {
@@ -309,283 +345,28 @@ async function appendJobError(
 // Main Orchestrator
 // ---------------------------------------------------------------------------
 
+const JOB_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+
 export async function runProfileAnalysis(
   jobId: string,
   userId: string,
   handle: string,
   reelCount: number,
-  accessToken: string
 ) {
-  const supabase = createClientWithToken(accessToken);
+  // Use service role client for background job DB writes.
+  // This avoids token expiry issues for long-running jobs.
+  const supabase = createServiceRoleClient();
+
+  // Wrap entire job in a timeout race
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error("Profile analysis timed out after 10 minutes")), JOB_TIMEOUT_MS);
+  });
 
   try {
-    // -----------------------------------------------------------------------
-    // Stage 1: Scrape
-    // -----------------------------------------------------------------------
-    await updateJob(supabase, jobId, { status: "scraping" });
-
-    const token = process.env.APIFY_API_TOKEN;
-    if (!token || token === "placeholder") {
-      throw new Error("Apify API token not configured");
-    }
-
-    const { ApifyClient } = await import("apify-client");
-    const apify = new ApifyClient({ token });
-    const profileUrl = `https://www.instagram.com/${handle}/`;
-
-    // Fetch profile details
-    let bio = "";
-    let profilePicUrl = "";
-    let followerCount = 0;
-    let displayName = handle;
-
-    try {
-      const profileRun = await apify
-        .actor("apify/instagram-api-scraper")
-        .call(
-          { directUrls: [profileUrl], resultsType: "details", resultsLimit: 1 },
-          { timeout: 30 }
-        );
-
-      const profileItems = await apify
-        .dataset(profileRun.defaultDatasetId)
-        .listItems();
-
-      const profile = profileItems.items[0] as
-        | Record<string, unknown>
-        | undefined;
-      const mapped = mapApifyProfile(profile, handle);
-      displayName = mapped.displayName;
-      followerCount = mapped.followerCount;
-      profilePicUrl = mapped.profilePicUrl;
-      bio = mapped.bio;
-    } catch (err) {
-      console.error(`[profile-analyzer] Profile fetch failed for @${handle}:`, err);
-      await appendJobError(supabase, jobId, `Profile fetch failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-
-    // Upsert creator
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .upsert(
-        {
-          user_id: userId,
-          platform: "instagram" as const,
-          handle,
-          display_name: displayName,
-          follower_count: followerCount,
-          bio,
-          profile_pic_url: profilePicUrl,
-          scraped_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,platform,handle" }
-      )
-      .select()
-      .single();
-
-    if (creatorError || !creator) {
-      throw new Error(`Creator upsert failed: ${creatorError?.message}`);
-    }
-
-    // Fetch posts
-    let rawPosts: Record<string, unknown>[] = [];
-    try {
-      console.log(`[profile-analyzer] Fetching posts for @${handle}, limit=${reelCount}`);
-      const postsRun = await apify
-        .actor("apify/instagram-api-scraper")
-        .call(
-          { directUrls: [profileUrl], resultsType: "posts", resultsLimit: reelCount + 5 },
-          { timeout: 90 }
-        );
-
-      const postsItems = await apify
-        .dataset(postsRun.defaultDatasetId)
-        .listItems();
-
-      rawPosts = postsItems.items as Record<string, unknown>[];
-      console.log(`[profile-analyzer] Got ${rawPosts.length} raw posts for @${handle}`);
-    } catch (err) {
-      throw new Error(
-        `Apify scrape failed for @${handle}: ${err instanceof Error ? err.message : String(err)}`
-      );
-    }
-
-    // Map and filter to reels
-    const allMapped = rawPosts.map((item, i) => mapApifyPostToScrapedPost(item, handle, i));
-    const reels = allMapped.filter((p) => p.contentType === "reel");
-    const nonReels = allMapped.filter((p) => p.contentType !== "reel");
-
-    // If not enough reels, include non-reels to hit the count
-    let postsToProcess = reels.slice(0, reelCount);
-    if (postsToProcess.length < reelCount) {
-      const needed = reelCount - postsToProcess.length;
-      postsToProcess = [...postsToProcess, ...nonReels.slice(0, needed)];
-    }
-
-    // Save content rows
-    const contentRows = postsToProcess.map((post) => ({
-      user_id: userId,
-      creator_id: creator.id,
-      platform: "instagram" as const,
-      external_id: post.externalId,
-      content_type: post.contentType,
-      caption: post.caption,
-      media_url: post.mediaUrl,
-      thumbnail_url: post.thumbnailUrl,
-      view_count: post.viewCount,
-      like_count: post.likeCount,
-      comment_count: post.commentCount,
-      share_count: post.shareCount,
-      engagement_ratio: calculateEngagementRatio(post),
-      carousel_urls: post.carouselUrls || [],
-      posted_at: post.postedAt,
-    }));
-
-    if (contentRows.length > 0) {
-      const { error: contentError } = await supabase
-        .from("content")
-        .upsert(contentRows, { onConflict: "creator_id,external_id" });
-
-      if (contentError) {
-        throw new Error(`Failed to save content: ${contentError.message}`);
-      }
-    }
-
-    // Fetch the content IDs we just saved
-    const { data: savedContent } = await supabase
-      .from("content")
-      .select("id, external_id, caption, media_url, view_count, like_count, comment_count, engagement_ratio, content_type")
-      .eq("creator_id", creator.id)
-      .eq("user_id", userId)
-      .in("external_id", postsToProcess.map((p) => p.externalId));
-
-    if (!savedContent || savedContent.length === 0) {
-      throw new Error("No content rows found after save");
-    }
-
-    await updateJob(supabase, jobId, { reels_scraped: savedContent.length });
-
-    // -----------------------------------------------------------------------
-    // Stage 2: Transcribe
-    // -----------------------------------------------------------------------
-    await updateJob(supabase, jobId, { status: "transcribing" });
-
-    const reelDataList: ReelData[] = [];
-    const transcribeConcurrency = 3;
-
-    for (let i = 0; i < savedContent.length; i += transcribeConcurrency) {
-      const chunk = savedContent.slice(i, i + transcribeConcurrency);
-      const results = await Promise.allSettled(
-        chunk.map(async (c) => {
-          let transcript = "";
-          if (c.media_url && c.content_type === "reel") {
-            try {
-              transcript = await transcribeVideoDirectly(c.media_url);
-            } catch (err) {
-              console.error(`[profile-analyzer] Transcription failed for ${c.external_id}:`, err);
-              await appendJobError(
-                supabase, jobId,
-                `Transcription failed for ${c.external_id}: ${err instanceof Error ? err.message : String(err)}`
-              );
-            }
-          }
-
-          // Save transcript to DB
-          if (transcript) {
-            await supabase
-              .from("content")
-              .update({ transcript })
-              .eq("id", c.id);
-          }
-
-          return {
-            content_id: c.id,
-            caption: c.caption || "",
-            transcript,
-            view_count: c.view_count,
-            like_count: c.like_count,
-            comment_count: c.comment_count,
-            engagement_ratio: c.engagement_ratio,
-          } as ReelData;
-        })
-      );
-
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          reelDataList.push(result.value);
-        }
-      }
-
-      await updateJob(supabase, jobId, { reels_transcribed: reelDataList.length });
-    }
-
-    // -----------------------------------------------------------------------
-    // Stage 3: Classify
-    // -----------------------------------------------------------------------
-    await updateJob(supabase, jobId, { status: "classifying" });
-
-    const classifyConcurrency = 5;
-    let classified = 0;
-
-    for (let i = 0; i < reelDataList.length; i += classifyConcurrency) {
-      const chunk = reelDataList.slice(i, i + classifyConcurrency);
-      await Promise.allSettled(
-        chunk.map(async (reel) => {
-          try {
-            const classification = await classifyReel(reel.caption, reel.transcript);
-            reel.classification = classification;
-
-            // Save reel_type + analysis to content row
-            await supabase
-              .from("content")
-              .update({
-                reel_type: classification.reel_type,
-                hook_text: classification.hook_text,
-                cta_text: classification.cta_text,
-                virality_score: classification.virality_score,
-                analyzed_at: new Date().toISOString(),
-              })
-              .eq("id", reel.content_id);
-
-            // Save tags
-            if (classification.tags.length > 0) {
-              await supabase.from("content_tags").upsert(
-                classification.tags.map((t) => ({
-                  content_id: reel.content_id,
-                  tag: t.tag,
-                  category: t.category,
-                })),
-                { onConflict: "content_id,tag" }
-              );
-            }
-
-            classified++;
-          } catch (err) {
-            console.error(`[profile-analyzer] Classification failed for ${reel.content_id}:`, err);
-            await appendJobError(
-              supabase, jobId,
-              `Classification failed: ${err instanceof Error ? err.message : String(err)}`
-            );
-          }
-        })
-      );
-
-      await updateJob(supabase, jobId, { reels_classified: classified });
-    }
-
-    // -----------------------------------------------------------------------
-    // Stage 4: Brand DNA
-    // -----------------------------------------------------------------------
-    await updateJob(supabase, jobId, { status: "analyzing_dna" });
-
-    const brandDNA = await generateBrandDNA(bio, reelDataList);
-
-    await updateJob(supabase, jobId, {
-      status: "done",
-      brand_dna: brandDNA,
-    });
-
-    console.log(`[profile-analyzer] Done for @${handle}: ${reelDataList.length} reels processed`);
+    await Promise.race([
+      runProfileAnalysisInner(supabase, jobId, userId, handle, reelCount),
+      timeoutPromise,
+    ]);
   } catch (err) {
     console.error(`[profile-analyzer] Fatal error for job ${jobId}:`, err);
     await updateJob(supabase, jobId, { status: "error" });
@@ -594,4 +375,289 @@ export async function runProfileAnalysis(
       err instanceof Error ? err.message : String(err)
     );
   }
+}
+
+async function runProfileAnalysisInner(
+  supabase: SupabaseServiceClient,
+  jobId: string,
+  userId: string,
+  handle: string,
+  reelCount: number,
+) {
+  // -----------------------------------------------------------------------
+  // Stage 1: Scrape
+  // -----------------------------------------------------------------------
+  await updateJob(supabase, jobId, { status: "scraping" });
+
+  const token = process.env.APIFY_API_TOKEN;
+  if (!token || token === "placeholder") {
+    throw new Error("Apify API token not configured");
+  }
+
+  const { ApifyClient } = await import("apify-client");
+  const apify = new ApifyClient({ token });
+  const profileUrl = `https://www.instagram.com/${handle}/`;
+
+  // Fetch profile details
+  let bio = "";
+  let profilePicUrl = "";
+  let followerCount = 0;
+  let displayName = handle;
+
+  try {
+    const profileRun = await apify
+      .actor("apify/instagram-api-scraper")
+      .call(
+        { directUrls: [profileUrl], resultsType: "details", resultsLimit: 1 },
+        { timeout: 30 }
+      );
+
+    const profileItems = await apify
+      .dataset(profileRun.defaultDatasetId)
+      .listItems();
+
+    const profile = profileItems.items[0] as
+      | Record<string, unknown>
+      | undefined;
+    const mapped = mapApifyProfile(profile, handle);
+    displayName = mapped.displayName;
+    followerCount = mapped.followerCount;
+    profilePicUrl = mapped.profilePicUrl;
+    bio = mapped.bio;
+  } catch (err) {
+    console.error(`[profile-analyzer] Profile fetch failed for @${handle}:`, err);
+    await appendJobError(supabase, jobId, `Profile fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  // Upsert creator
+  const { data: creator, error: creatorError } = await supabase
+    .from("creators")
+    .upsert(
+      {
+        user_id: userId,
+        platform: "instagram" as const,
+        handle,
+        display_name: displayName,
+        follower_count: followerCount,
+        bio,
+        profile_pic_url: profilePicUrl,
+        scraped_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,platform,handle" }
+    )
+    .select()
+    .single();
+
+  if (creatorError || !creator) {
+    throw new Error(`Creator upsert failed: ${creatorError?.message}`);
+  }
+
+  // Fetch posts
+  let rawPosts: Record<string, unknown>[] = [];
+  try {
+    console.log(`[profile-analyzer] Fetching posts for @${handle}, limit=${reelCount}`);
+    const postsRun = await apify
+      .actor("apify/instagram-api-scraper")
+      .call(
+        { directUrls: [profileUrl], resultsType: "posts", resultsLimit: reelCount + 5 },
+        { timeout: 90 }
+      );
+
+    const postsItems = await apify
+      .dataset(postsRun.defaultDatasetId)
+      .listItems();
+
+    rawPosts = postsItems.items as Record<string, unknown>[];
+    console.log(`[profile-analyzer] Got ${rawPosts.length} raw posts for @${handle}`);
+  } catch (err) {
+    throw new Error(
+      `Apify scrape failed for @${handle}: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
+
+  // Map and filter to reels
+  const allMapped = rawPosts.map((item, i) => mapApifyPostToScrapedPost(item, handle, i));
+  const reels = allMapped.filter((p) => p.contentType === "reel");
+  const nonReels = allMapped.filter((p) => p.contentType !== "reel");
+
+  // If not enough reels, include non-reels to hit the count
+  let postsToProcess = reels.slice(0, reelCount);
+  if (postsToProcess.length < reelCount) {
+    const needed = reelCount - postsToProcess.length;
+    postsToProcess = [...postsToProcess, ...nonReels.slice(0, needed)];
+  }
+
+  // Save content rows
+  const contentRows = postsToProcess.map((post) => ({
+    user_id: userId,
+    creator_id: creator.id,
+    platform: "instagram" as const,
+    external_id: post.externalId,
+    content_type: post.contentType,
+    caption: post.caption,
+    media_url: post.mediaUrl,
+    thumbnail_url: post.thumbnailUrl,
+    view_count: post.viewCount,
+    like_count: post.likeCount,
+    comment_count: post.commentCount,
+    share_count: post.shareCount,
+    engagement_ratio: calculateEngagementRatio(post),
+    carousel_urls: post.carouselUrls || [],
+    posted_at: post.postedAt,
+  }));
+
+  if (contentRows.length > 0) {
+    const { error: contentError } = await supabase
+      .from("content")
+      .upsert(contentRows, { onConflict: "creator_id,external_id" });
+
+    if (contentError) {
+      throw new Error(`Failed to save content: ${contentError.message}`);
+    }
+  }
+
+  // Fetch the content IDs we just saved
+  const { data: savedContent } = await supabase
+    .from("content")
+    .select("id, external_id, caption, media_url, view_count, like_count, comment_count, engagement_ratio, content_type")
+    .eq("creator_id", creator.id)
+    .eq("user_id", userId)
+    .in("external_id", postsToProcess.map((p) => p.externalId));
+
+  if (!savedContent || savedContent.length === 0) {
+    throw new Error("No content rows found after save");
+  }
+
+  await updateJob(supabase, jobId, { reels_scraped: savedContent.length });
+
+  // -----------------------------------------------------------------------
+  // Stage 2: Transcribe
+  // -----------------------------------------------------------------------
+  await updateJob(supabase, jobId, { status: "transcribing" });
+
+  const reelDataList: ReelData[] = [];
+  const transcribeConcurrency = 3;
+
+  for (let i = 0; i < savedContent.length; i += transcribeConcurrency) {
+    const chunk = savedContent.slice(i, i + transcribeConcurrency);
+    const results = await Promise.allSettled(
+      chunk.map(async (c) => {
+        let transcript = "";
+        if (c.media_url && c.content_type === "reel") {
+          try {
+            transcript = await withRetry(
+              () => transcribeVideoDirectly(c.media_url),
+              { maxRetries: 2, backoffMs: 1000, label: `transcribe-${c.external_id}` }
+            );
+          } catch (err) {
+            console.error(`[profile-analyzer] Transcription failed for ${c.external_id}:`, err);
+            await appendJobError(
+              supabase, jobId,
+              `Transcription failed for ${c.external_id}: ${err instanceof Error ? err.message : String(err)}`
+            );
+          }
+        }
+
+        // Save transcript to DB
+        if (transcript) {
+          await supabase
+            .from("content")
+            .update({ transcript })
+            .eq("id", c.id);
+        }
+
+        return {
+          content_id: c.id,
+          caption: c.caption || "",
+          transcript,
+          view_count: c.view_count,
+          like_count: c.like_count,
+          comment_count: c.comment_count,
+          engagement_ratio: c.engagement_ratio,
+        } as ReelData;
+      })
+    );
+
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        reelDataList.push(result.value);
+      }
+    }
+
+    await updateJob(supabase, jobId, { reels_transcribed: reelDataList.length });
+  }
+
+  // -----------------------------------------------------------------------
+  // Stage 3: Classify
+  // -----------------------------------------------------------------------
+  await updateJob(supabase, jobId, { status: "classifying" });
+
+  const classifyConcurrency = 5;
+  let classified = 0;
+
+  for (let i = 0; i < reelDataList.length; i += classifyConcurrency) {
+    const chunk = reelDataList.slice(i, i + classifyConcurrency);
+    await Promise.allSettled(
+      chunk.map(async (reel) => {
+        try {
+          const classification = await withRetry(
+            () => classifyReel(reel.caption, reel.transcript),
+            { maxRetries: 2, backoffMs: 1000, label: `classifyReel-${reel.content_id}` }
+          );
+          reel.classification = classification;
+
+          // Save reel_type + analysis to content row
+          await supabase
+            .from("content")
+            .update({
+              reel_type: classification.reel_type,
+              hook_text: classification.hook_text,
+              cta_text: classification.cta_text,
+              virality_score: classification.virality_score,
+              analyzed_at: new Date().toISOString(),
+            })
+            .eq("id", reel.content_id);
+
+          // Save tags
+          if (classification.tags.length > 0) {
+            await supabase.from("content_tags").upsert(
+              classification.tags.map((t) => ({
+                content_id: reel.content_id,
+                tag: t.tag,
+                category: t.category,
+              })),
+              { onConflict: "content_id,tag" }
+            );
+          }
+
+          classified++;
+        } catch (err) {
+          console.error(`[profile-analyzer] Classification failed for ${reel.content_id}:`, err);
+          await appendJobError(
+            supabase, jobId,
+            `Classification failed: ${err instanceof Error ? err.message : String(err)}`
+          );
+        }
+      })
+    );
+
+    await updateJob(supabase, jobId, { reels_classified: classified });
+  }
+
+  // -----------------------------------------------------------------------
+  // Stage 4: Brand DNA
+  // -----------------------------------------------------------------------
+  await updateJob(supabase, jobId, { status: "analyzing_dna" });
+
+  const brandDNA = await withRetry(
+    () => generateBrandDNA(bio, reelDataList),
+    { maxRetries: 2, backoffMs: 2000, label: "generateBrandDNA" }
+  );
+
+  await updateJob(supabase, jobId, {
+    status: "done",
+    brand_dna: brandDNA,
+  });
+
+  console.log(`[profile-analyzer] Done for @${handle}: ${reelDataList.length} reels processed`);
 }

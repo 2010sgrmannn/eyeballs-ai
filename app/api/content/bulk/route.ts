@@ -8,9 +8,10 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser();
 
-    if (!user) {
+    if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -23,6 +24,13 @@ export async function POST(request: Request) {
     if (!action || !Array.isArray(content_ids) || content_ids.length === 0) {
       return NextResponse.json(
         { error: "action and content_ids are required" },
+        { status: 400 }
+      );
+    }
+
+    if (content_ids.length > 100) {
+      return NextResponse.json(
+        { error: "content_ids cannot exceed 100 items" },
         { status: 400 }
       );
     }

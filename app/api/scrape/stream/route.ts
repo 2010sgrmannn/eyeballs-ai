@@ -22,15 +22,23 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
   }
 
-  const body = await request.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid request body" }), {
+      status: 400,
+    });
+  }
   const platform = body.platform as Platform;
   const handle = (body.handle as string)?.trim().replace(/^@/, "");
   const depth = body.depth as ScrapeDepth;
@@ -119,7 +127,7 @@ export async function POST(request: Request) {
         });
 
         // Update creator record
-        await supabase
+        const { error: creatorUpdateError } = await supabase
           .from("creators")
           .update({
             display_name: displayName,
@@ -127,6 +135,10 @@ export async function POST(request: Request) {
             scraped_at: new Date().toISOString(),
           })
           .eq("id", creator.id);
+
+        if (creatorUpdateError) {
+          console.error(`[scrape/stream] Failed to update creator metadata for @${handle}:`, creatorUpdateError.message);
+        }
 
         // Phase 3: Fetch posts
         send({

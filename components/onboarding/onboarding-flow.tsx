@@ -14,16 +14,19 @@ export function OnboardingFlow() {
   const [view, setView] = useState<View>("form");
   const [handle, setHandle] = useState("");
   const [dnaData, setDnaData] = useState<Partial<BrandProfileFormData> | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
 
   const analysis = useProfileAnalysis();
 
   const handleAnalysisStart = useCallback(
     (igHandle: string) => {
+      if (isStarting) return;
+      setIsStarting(true);
       setHandle(igHandle.replace(/^@/, ""));
       analysis.start(igHandle);
       setView("analyzing");
     },
-    [analysis]
+    [analysis, isStarting]
   );
 
   const handleContinue = useCallback(() => {
@@ -53,6 +56,7 @@ export function OnboardingFlow() {
   }, [analysis.results]);
 
   const handleBack = useCallback(() => {
+    setIsStarting(false);
     setView("form");
   }, []);
 
@@ -68,6 +72,7 @@ export function OnboardingFlow() {
           <BrandProfileForm
             mode="onboarding"
             onAnalysisStart={handleAnalysisStart}
+            isAnalysisStarting={isStarting}
           />
         </motion.div>
       )}

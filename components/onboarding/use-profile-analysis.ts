@@ -41,6 +41,8 @@ interface UseProfileAnalysisReturn {
   overallProgress: number;
 }
 
+const MAX_CONSECUTIVE_FAILURES = 5;
+
 function calcProgress(phase: AnalysisPhase, p: AnalysisProgress): number {
   const total = p.reelsRequested || 10;
   switch (phase) {
@@ -79,10 +81,13 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
   const jobIdRef = useRef<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const handleRef = useRef<string>("");
+  const abortRef = useRef<AbortController | null>(null);
+  const consecutiveFailuresRef = useRef(0);
 
   useEffect(() => {
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
+      if (abortRef.current) abortRef.current.abort();
     };
   }, []);
 
@@ -90,6 +95,14 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
     const clean = handle.trim().replace(/^@/, "");
     if (!clean) return;
     handleRef.current = clean;
+
+    // Abort any previous in-flight request
+    if (abortRef.current) abortRef.current.abort();
+    if (pollingRef.current) clearInterval(pollingRef.current);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    consecutiveFailuresRef.current = 0;
 
     setPhase("pending");
     setProgress({ reelsRequested: 10, reelsScraped: 0, reelsTranscribed: 0, reelsClassified: 0 });
@@ -102,6 +115,7 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ handle: clean, reel_count: 10 }),
+          signal: controller.signal,
         });
 
         if (!startRes.ok) throw new Error("Failed to start profile analysis");
@@ -120,8 +134,22 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
               return;
             }
 
-            const statusRes = await fetch(`/api/profile-analyzer/status?job_id=${job_id}`);
-            if (!statusRes.ok) return;
+            const statusRes = await fetch(`/api/profile-analyzer/status?job_id=${job_id}`, {
+              signal: controller.signal,
+            });
+            if (!statusRes.ok) {
+              consecutiveFailuresRef.current++;
+              if (consecutiveFailuresRef.current >= MAX_CONSECUTIVE_FAILURES) {
+                if (pollingRef.current) clearInterval(pollingRef.current);
+                setPhase("error");
+                setError("Lost connection to analysis server");
+              }
+              return;
+            }
+
+            // Reset on success
+            consecutiveFailuresRef.current = 0;
+
             const data = await statusRes.json();
 
             setProgress({
@@ -139,7 +167,9 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
             if (data.status === "done") {
               if (pollingRef.current) clearInterval(pollingRef.current);
 
-              const resultsRes = await fetch(`/api/profile-analyzer/results?job_id=${job_id}`);
+              const resultsRes = await fetch(`/api/profile-analyzer/results?job_id=${job_id}`, {
+                signal: controller.signal,
+              });
               if (resultsRes.ok) {
                 const r = await resultsRes.json();
                 setResults({
@@ -153,11 +183,22 @@ export function useProfileAnalysis(): UseProfileAnalysisReturn {
               setPhase("error");
               setError(data.errors?.[data.errors.length - 1] || "Analysis failed");
             }
-          } catch {
-            // ignore poll errors
+          } catch (pollErr) {
+            // Ignore abort errors
+            if (pollErr instanceof DOMException && pollErr.name === "AbortError") return;
+
+            consecutiveFailuresRef.current++;
+            if (consecutiveFailuresRef.current >= MAX_CONSECUTIVE_FAILURES) {
+              if (pollingRef.current) clearInterval(pollingRef.current);
+              setPhase("error");
+              setError("Lost connection to analysis server");
+            }
           }
         }, 3000);
       } catch (err) {
+        // Ignore abort errors
+        if (err instanceof DOMException && err.name === "AbortError") return;
+
         setPhase("error");
         setError(err instanceof Error ? err.message : "Something went wrong");
       }

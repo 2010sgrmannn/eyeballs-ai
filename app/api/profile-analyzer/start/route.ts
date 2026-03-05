@@ -1,4 +1,4 @@
-import { createClient, createClientWithToken } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { after } from "next/server";
 import { runProfileAnalysis } from "@/services/profile-analyzer";
 
@@ -9,21 +9,11 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
-  // Capture the access token NOW while we have cookie access.
-  // after() runs post-response where cookies() is unreliable.
-  const { data: sessionData } = await supabase.auth.getSession();
-  const accessToken = sessionData?.session?.access_token;
-
-  if (!accessToken) {
-    return new Response(JSON.stringify({ error: "No active session" }), {
       status: 401,
     });
   }
@@ -81,26 +71,13 @@ export async function POST(request: Request) {
   }
 
   // Run analysis in background after response.
-  // Pass accessToken so the background job can create its own Supabase client
-  // without relying on cookies() (which is broken in after() context).
+  // The profile analyzer now uses a service-role Supabase client internally,
+  // so we no longer need to pass an access token.
   after(async () => {
     try {
-      await runProfileAnalysis(job.id, user.id, handle, reelCount, accessToken);
+      await runProfileAnalysis(job.id, user.id, handle, reelCount);
     } catch (err) {
       console.error("[profile-analyzer/start] Fatal error:", err);
-      try {
-        const sb = createClientWithToken(accessToken);
-        await sb
-          .from("profile_analysis_jobs")
-          .update({
-            status: "error",
-            errors: [err instanceof Error ? err.message : String(err)],
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", job.id);
-      } catch (updateErr) {
-        console.error("[profile-analyzer/start] Failed to update job status:", updateErr);
-      }
     }
   });
 

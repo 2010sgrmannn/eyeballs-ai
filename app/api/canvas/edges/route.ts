@@ -5,9 +5,10 @@ export async function GET() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -28,13 +29,20 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
   const { source_node_id, target_node_id, edge_type, animated } = body;
 
   if (!source_node_id || !target_node_id) {
@@ -56,8 +64,8 @@ export async function POST(request: NextRequest) {
     .from("canvas_edges")
     .select("id")
     .eq("user_id", user.id)
-    .eq("source_node_id", source_node_id)
-    .eq("target_node_id", target_node_id)
+    .eq("source_node_id", source_node_id as string)
+    .eq("target_node_id", target_node_id as string)
     .maybeSingle();
 
   if (duplicate) {
@@ -73,8 +81,8 @@ export async function POST(request: NextRequest) {
       user_id: user.id,
       source_node_id,
       target_node_id,
-      edge_type: edge_type ?? "default",
-      animated: animated ?? true,
+      edge_type: (edge_type as string) ?? "default",
+      animated: (animated as boolean) ?? true,
     })
     .select()
     .single();
@@ -90,9 +98,10 @@ export async function DELETE(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -46,3 +46,14 @@ export function createClientWithToken(accessToken: string) {
     }
   );
 }
+
+/**
+ * Create a Supabase client with the service role key.
+ * This bypasses RLS and should ONLY be used for server-side background jobs.
+ */
+export function createServiceRoleClient() {
+  return createJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
