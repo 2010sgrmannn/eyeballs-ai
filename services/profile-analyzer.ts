@@ -416,12 +416,15 @@ async function runProfileAnalysisInner(
   let displayName = handle;
 
   try {
-    const profileRun = await apify
-      .actor("apify/instagram-api-scraper")
-      .call(
-        { directUrls: [profileUrl], resultsType: "details", resultsLimit: 1 },
-        { timeout: 30 }
-      );
+    const profileRun = await withRetry(
+      () => apify
+        .actor("apify/instagram-api-scraper")
+        .call(
+          { directUrls: [profileUrl], resultsType: "details", resultsLimit: 1 },
+          { timeout: 30 }
+        ),
+      { maxRetries: 1, backoffMs: 2000, label: "apify-profile-details" }
+    );
 
     const profileItems = await apify
       .dataset(profileRun.defaultDatasetId)
@@ -467,12 +470,15 @@ async function runProfileAnalysisInner(
   let rawPosts: Record<string, unknown>[] = [];
   try {
     console.log(`[profile-analyzer] Fetching posts for @${handle}, limit=${reelCount}`);
-    const postsRun = await apify
-      .actor("apify/instagram-api-scraper")
-      .call(
-        { directUrls: [profileUrl], resultsType: "posts", resultsLimit: reelCount + 5 },
-        { timeout: 90 }
-      );
+    const postsRun = await withRetry(
+      () => apify
+        .actor("apify/instagram-api-scraper")
+        .call(
+          { directUrls: [profileUrl], resultsType: "posts", resultsLimit: reelCount + 5 },
+          { timeout: 90 }
+        ),
+      { maxRetries: 1, backoffMs: 3000, label: "apify-posts-scrape" }
+    );
 
     const postsItems = await apify
       .dataset(postsRun.defaultDatasetId)
