@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-03-05T10:00:00Z",
+  "category": "technical-gotcha",
+  "title": "Supabase background jobs need service role key, not user tokens",
+  "description": "When running long-running background jobs in Next.js after() callbacks, user access tokens can expire mid-job. Use SUPABASE_SERVICE_ROLE_KEY with createClient() instead of passing accessToken. The service role client bypasses RLS entirely, so only use it for server-side trusted code paths.",
+  "tags": ["supabase", "auth", "background-jobs", "next.js"]
+}

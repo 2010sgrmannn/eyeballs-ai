@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-03-05T12:00:00Z",
+  "category": "workflow",
+  "summary": "Middleware test failures (6) are pre-existing on main and not related to feature branches",
+  "details": "The 6 middleware test failures related to profile-based routing redirects exist on both main and feature branches. They should not block QA verdicts for unrelated changes.",
+  "source_agent": "qa",
+  "issue": 36
+}
