@@ -9,7 +9,7 @@ export function GlowingBorder({
 }) {
   return (
     <div className={`glow-border relative rounded-2xl p-[2px] ${className}`}>
-      <div className="relative z-10 rounded-2xl bg-[#0F1923] overflow-hidden">
+      <div className="relative z-10 rounded-2xl bg-[#0e1115] overflow-hidden">
         {children}
       </div>
     </div>

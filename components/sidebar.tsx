@@ -120,10 +120,10 @@ const platforms: PlatformFilterItem[] = [
 
 function InstagramIcon({ active }: { active: boolean }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "#FF2D2D" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "#ff3333" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
       <circle cx="12" cy="12" r="5" />
-      <circle cx="17.5" cy="6.5" r="1.5" fill={active ? "#FF2D2D" : "currentColor"} stroke="none" />
+      <circle cx="17.5" cy="6.5" r="1.5" fill={active ? "#ff3333" : "currentColor"} stroke="none" />
     </svg>
   );
 }

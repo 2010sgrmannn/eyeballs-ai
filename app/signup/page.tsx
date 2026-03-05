@@ -69,9 +69,9 @@ export default function SignupPage() {
   }
 
   const inputStyle = {
-    border: "1px solid #1F1F1F",
-    background: "#111111",
-    color: "#FAFAFA",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    background: "#0e1115",
+    color: "#f0f2f5",
     fontFamily: "var(--font-body)",
     fontSize: "14px",
     transition: "border-color 0.2s",
@@ -87,7 +87,7 @@ export default function SignupPage() {
   return (
     <main
       className="flex min-h-screen flex-col items-center justify-center px-4"
-      style={{ background: "#0A0A0A" }}
+      style={{ background: "#080a0c" }}
     >
       <div className="w-full max-w-sm space-y-6">
         {confirmationSent ? (
@@ -112,14 +112,14 @@ export default function SignupPage() {
               Check your email
             </h1>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1", lineHeight: 1.6 }}>
-              We sent a confirmation link to <span style={{ color: "#FAFAFA", fontWeight: 500 }}>{email}</span>.
+              We sent a confirmation link to <span style={{ color: "#f0f2f5", fontWeight: 500 }}>{email}</span>.
               Click the link in the email to activate your account, then come back and log in.
             </p>
             <Link
               href="/login"
               className="inline-block mt-2 px-6 py-2.5 rounded-lg transition-all hover:opacity-90"
               style={{
-                background: "#FF2D2D",
+                background: "#ff3333",
                 color: "#FFFFFF",
                 fontFamily: "var(--font-body)",
                 fontSize: "14px",
@@ -158,7 +158,7 @@ export default function SignupPage() {
               style={{
                 border: "1px solid rgba(239, 68, 68, 0.3)",
                 background: "rgba(239, 68, 68, 0.08)",
-                color: "#EF4444",
+                color: "#ff3333",
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
               }}
@@ -178,7 +178,7 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -194,7 +194,7 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
               autoComplete="new-password"
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -210,7 +210,7 @@ export default function SignupPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repeat your password"
               autoComplete="new-password"
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -220,8 +220,8 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full px-4 py-2.5 rounded-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             style={{
-              border: "1px solid #FF2D2D",
-              background: "#FF2D2D",
+              border: "1px solid #ff3333",
+              background: "#ff3333",
               color: "#FFFFFF",
               fontFamily: "var(--font-body)",
               fontSize: "14px",
@@ -240,7 +240,7 @@ export default function SignupPage() {
           <Link
             href="/login"
             className="transition-colors hover:text-[#FF5555]"
-            style={{ color: "#FF2D2D" }}
+            style={{ color: "#ff3333" }}
           >
             Log in
           </Link>

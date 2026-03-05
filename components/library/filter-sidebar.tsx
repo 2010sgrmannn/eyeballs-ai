@@ -74,8 +74,8 @@ export function FilterSidebar({
   }
 
   const selectStyle = {
-    border: "1px solid #1F1F1F",
-    background: "#0A0A0A",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    background: "#080a0c",
     color: "#E0E0E0",
     fontFamily: "var(--font-body)",
     fontSize: "13px",
@@ -83,8 +83,8 @@ export function FilterSidebar({
   };
 
   const numberInputStyle = {
-    border: "1px solid #1F1F1F",
-    background: "#0A0A0A",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    background: "#080a0c",
     color: "#E0E0E0",
     fontFamily: "var(--font-mono)",
     fontSize: "12px",
@@ -94,7 +94,7 @@ export function FilterSidebar({
   return (
     <aside
       className="w-full space-y-5 rounded-lg p-4 lg:w-64 lg:shrink-0"
-      style={{ border: "1px solid #1F1F1F", background: "#1A1A1A", borderRadius: "12px" }}
+      style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#141820", borderRadius: "12px" }}
     >
       <div className="flex items-center justify-between">
         <h2
@@ -119,7 +119,7 @@ export function FilterSidebar({
         <select
           value={sortField}
           onChange={(e) => onSortChange(e.target.value as SortField, sortDirection)}
-          className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+          className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
           style={selectStyle}
         >
           {(Object.entries(SORT_FIELD_LABELS) as [SortField, string][]).map(
@@ -136,9 +136,9 @@ export function FilterSidebar({
             onClick={() => onSortChange(sortField, "desc")}
             className="flex-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
             style={{
-              border: sortDirection === "desc" ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+              border: sortDirection === "desc" ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
               background: sortDirection === "desc" ? "rgba(255, 45, 45, 0.15)" : "#161616",
-              color: sortDirection === "desc" ? "#FF2D2D" : "#888",
+              color: sortDirection === "desc" ? "#ff3333" : "#888",
               fontFamily: "var(--font-body)",
               fontSize: "12px",
             }}
@@ -150,9 +150,9 @@ export function FilterSidebar({
             onClick={() => onSortChange(sortField, "asc")}
             className="flex-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
             style={{
-              border: sortDirection === "asc" ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+              border: sortDirection === "asc" ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
               background: sortDirection === "asc" ? "rgba(255, 45, 45, 0.15)" : "#161616",
-              color: sortDirection === "asc" ? "#FF2D2D" : "#888",
+              color: sortDirection === "asc" ? "#ff3333" : "#888",
               fontFamily: "var(--font-body)",
               fontSize: "12px",
             }}
@@ -169,7 +169,7 @@ export function FilterSidebar({
           onChange={(e) =>
             onGroupByChange(e.target.value as GroupByField | "none")
           }
-          className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+          className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
           style={selectStyle}
         >
           {(
@@ -192,9 +192,9 @@ export function FilterSidebar({
           onClick={() => updateFilter("favoritesOnly", !filters.favoritesOnly)}
           className="rounded-md px-2.5 py-1 text-xs transition-all duration-200"
           style={{
-            border: filters.favoritesOnly ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+            border: filters.favoritesOnly ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
             background: filters.favoritesOnly ? "rgba(255, 45, 45, 0.15)" : "#161616",
-            color: filters.favoritesOnly ? "#FF2D2D" : "#888",
+            color: filters.favoritesOnly ? "#ff3333" : "#888",
             fontFamily: "var(--font-body)",
             fontSize: "12px",
           }}
@@ -209,7 +209,7 @@ export function FilterSidebar({
           <select
             value={filters.folderId}
             onChange={(e) => updateFilter("folderId", e.target.value)}
-            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
             style={selectStyle}
           >
             <option value="">All folders</option>
@@ -239,9 +239,9 @@ export function FilterSidebar({
                 }
                 className="rounded-md px-2.5 py-1 text-xs capitalize transition-all duration-200"
                 style={{
-                  border: active ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+                  border: active ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
                   background: active ? "rgba(255, 45, 45, 0.15)" : "#161616",
-                  color: active ? "#FF2D2D" : "#888",
+                  color: active ? "#ff3333" : "#888",
                   fontFamily: "var(--font-body)",
                   fontSize: "12px",
                 }}
@@ -264,7 +264,7 @@ export function FilterSidebar({
                 e.target.value ? [e.target.value] : []
               )
             }
-            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
             style={selectStyle}
           >
             <option value="">All creators</option>
@@ -295,9 +295,9 @@ export function FilterSidebar({
                   }
                   className="rounded-md px-2.5 py-1 text-xs transition-all duration-200"
                   style={{
-                    border: active ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+                    border: active ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
                     background: active ? "rgba(255, 45, 45, 0.15)" : "#161616",
-                    color: active ? "#FF2D2D" : "#888",
+                    color: active ? "#ff3333" : "#888",
                     fontFamily: "var(--font-body)",
                     fontSize: "12px",
                   }}
@@ -328,9 +328,9 @@ export function FilterSidebar({
                   }
                   className="rounded-md px-2.5 py-1 text-xs transition-all duration-200"
                   style={{
-                    border: active ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+                    border: active ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
                     background: active ? "rgba(255, 45, 45, 0.15)" : "#161616",
-                    color: active ? "#FF2D2D" : "#888",
+                    color: active ? "#ff3333" : "#888",
                     fontFamily: "var(--font-body)",
                     fontSize: "12px",
                   }}
@@ -361,9 +361,9 @@ export function FilterSidebar({
                   }
                   className="rounded-md px-2.5 py-1 text-xs transition-all duration-200"
                   style={{
-                    border: active ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+                    border: active ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
                     background: active ? "rgba(255, 45, 45, 0.15)" : "#161616",
-                    color: active ? "#FF2D2D" : "#888",
+                    color: active ? "#ff3333" : "#888",
                     fontFamily: "var(--font-body)",
                     fontSize: "12px",
                   }}
@@ -387,7 +387,7 @@ export function FilterSidebar({
             onChange={(e) =>
               updateFilter("viralityMin", Number(e.target.value))
             }
-            className="w-16 px-2 py-1 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-16 px-2 py-1 focus:outline-none focus:border-[#ff3333]"
             style={numberInputStyle}
           />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#555" }}>to</span>
@@ -399,7 +399,7 @@ export function FilterSidebar({
             onChange={(e) =>
               updateFilter("viralityMax", Number(e.target.value))
             }
-            className="w-16 px-2 py-1 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-16 px-2 py-1 focus:outline-none focus:border-[#ff3333]"
             style={numberInputStyle}
           />
         </div>
@@ -417,7 +417,7 @@ export function FilterSidebar({
             onChange={(e) =>
               updateFilter("engagementMin", Number(e.target.value))
             }
-            className="w-16 px-2 py-1 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-16 px-2 py-1 focus:outline-none focus:border-[#ff3333]"
             style={numberInputStyle}
           />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#555" }}>to</span>
@@ -430,7 +430,7 @@ export function FilterSidebar({
             onChange={(e) =>
               updateFilter("engagementMax", Number(e.target.value))
             }
-            className="w-16 px-2 py-1 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-16 px-2 py-1 focus:outline-none focus:border-[#ff3333]"
             style={numberInputStyle}
           />
         </div>
@@ -443,14 +443,14 @@ export function FilterSidebar({
             type="date"
             value={filters.dateFrom}
             onChange={(e) => updateFilter("dateFrom", e.target.value)}
-            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
             style={selectStyle}
           />
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => updateFilter("dateTo", e.target.value)}
-            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#FF2D2D]"
+            className="w-full px-2 py-1.5 focus:outline-none focus:border-[#ff3333]"
             style={selectStyle}
           />
         </div>

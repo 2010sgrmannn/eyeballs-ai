@@ -42,14 +42,14 @@ export function ScriptsClient({ initialScripts, niches }: ScriptsClientProps) {
 
       <div
         className="mt-6 flex gap-1"
-        style={{ borderBottom: "1px solid #1F1F1F" }}
+        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.07)" }}
       >
         <button
           onClick={() => setActiveTab("generate")}
           className="px-4 py-2 transition-all"
           style={{
-            borderBottom: activeTab === "generate" ? "2px solid #FF2D2D" : "2px solid transparent",
-            color: activeTab === "generate" ? "#FAFAFA" : "#6B6B6B",
+            borderBottom: activeTab === "generate" ? "2px solid #ff3333" : "2px solid transparent",
+            color: activeTab === "generate" ? "#f0f2f5" : "#6b7280",
             fontFamily: "var(--font-body)",
             fontSize: "13px",
             fontWeight: 500,
@@ -62,8 +62,8 @@ export function ScriptsClient({ initialScripts, niches }: ScriptsClientProps) {
           onClick={() => setActiveTab("history")}
           className="px-4 py-2 transition-all"
           style={{
-            borderBottom: activeTab === "history" ? "2px solid #FF2D2D" : "2px solid transparent",
-            color: activeTab === "history" ? "#FAFAFA" : "#6B6B6B",
+            borderBottom: activeTab === "history" ? "2px solid #ff3333" : "2px solid transparent",
+            color: activeTab === "history" ? "#f0f2f5" : "#6b7280",
             fontFamily: "var(--font-body)",
             fontSize: "13px",
             fontWeight: 500,

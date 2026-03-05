@@ -297,7 +297,7 @@ export default function ScraperPage() {
                 fontFamily: "var(--font-heading)",
                 fontSize: "22px",
                 fontWeight: 700,
-                color: "#FAFAFA",
+                color: "#f0f2f5",
               }}
             >
               {phase === "done"
@@ -316,14 +316,14 @@ export default function ScraperPage() {
           {!isWorking && (
             <button
               onClick={handleBack}
-              className="rounded-lg transition-all duration-200 hover:border-[#FF2D2D] hover:scale-[1.02]"
+              className="rounded-lg transition-all duration-200 hover:border-[#ff3333] hover:scale-[1.02]"
               style={{
                 border: "1px solid #333",
                 background: "transparent",
                 fontFamily: "var(--font-heading)",
                 fontSize: "13px",
                 fontWeight: 500,
-                color: "#FAFAFA",
+                color: "#f0f2f5",
                 padding: "8px 20px",
               }}
             >
@@ -336,13 +336,13 @@ export default function ScraperPage() {
         {isWorking && (
           <div
             className="flex items-center gap-3 rounded-lg p-4"
-            style={{ border: "1px solid #1F1F1F", background: "#111111" }}
+            style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}
           >
             <div
               className="h-5 w-5 animate-spin rounded-full"
-              style={{ border: "2px solid #333", borderTopColor: "#FF2D2D" }}
+              style={{ border: "2px solid #333", borderTopColor: "#ff3333" }}
             />
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5" }}>
               {statusMessage}
             </span>
           </div>
@@ -350,7 +350,7 @@ export default function ScraperPage() {
 
         {/* Profile card */}
         {profileInfo && (
-          <div className="rounded-xl p-5" style={{ border: "1px solid #1F1F1F", background: "#111111" }}>
+          <div className="rounded-xl p-5" style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}>
             <div className="flex items-center gap-4">
               {profileInfo.profilePicUrl ? (
                 <img
@@ -368,14 +368,14 @@ export default function ScraperPage() {
                     fontFamily: "var(--font-heading)",
                     fontSize: "18px",
                     fontWeight: 700,
-                    color: "#FF2D2D",
+                    color: "#ff3333",
                   }}
                 >
                   {profileInfo.displayName.charAt(0)}
                 </div>
               )}
               <div>
-                <p style={{ fontFamily: "var(--font-heading)", fontSize: "16px", fontWeight: 600, color: "#FAFAFA" }}>
+                <p style={{ fontFamily: "var(--font-heading)", fontSize: "16px", fontWeight: 600, color: "#f0f2f5" }}>
                   {profileInfo.displayName}
                 </p>
                 <p style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#00D4D4" }}>
@@ -383,10 +383,10 @@ export default function ScraperPage() {
                 </p>
               </div>
               <div className="ml-auto text-right">
-                <p style={{ fontFamily: "var(--font-mono)", fontSize: "18px", fontWeight: 700, color: "#FF2D2D" }}>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: "18px", fontWeight: 700, color: "#ff3333" }}>
                   {formatNumber(profileInfo.followerCount)}
                 </p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", letterSpacing: "0.5px", textTransform: "uppercase" }}>
                   Followers
                 </p>
               </div>
@@ -416,7 +416,7 @@ export default function ScraperPage() {
             <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "#161616" }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
-                style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #FF2D2D, #00D4D4)" }}
+                style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #ff3333, #00D4D4)" }}
               />
             </div>
           </div>
@@ -432,14 +432,14 @@ export default function ScraperPage() {
               <div
                 key={i}
                 className="flex gap-4 rounded-xl p-4 transition-all duration-200 hover:-translate-y-px animate-in fade-in slide-in-from-bottom-2 duration-300"
-                style={{ border: "1px solid #1F1F1F", background: "#111111" }}
+                style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}
               >
                 {post.thumbnailUrl && (
                   <img
                     src={proxyUrl(post.thumbnailUrl)}
                     alt=""
                     className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-                    style={{ border: "1px solid #1F1F1F" }}
+                    style={{ border: "1px solid rgba(255, 255, 255, 0.07)" }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
@@ -454,7 +454,7 @@ export default function ScraperPage() {
                         fontSize: "11px",
                         fontWeight: 500,
                         ...(post.contentType === "reel"
-                          ? { background: "rgba(255, 45, 45, 0.1)", color: "#FF2D2D", border: "1px solid rgba(255, 45, 45, 0.2)" }
+                          ? { background: "rgba(255, 45, 45, 0.1)", color: "#ff3333", border: "1px solid rgba(255, 45, 45, 0.2)" }
                           : post.contentType === "carousel"
                             ? { background: "rgba(0, 212, 212, 0.1)", color: "#00D4D4", border: "1px solid rgba(0, 212, 212, 0.2)" }
                             : { background: "rgba(136, 136, 136, 0.1)", color: "#A1A1A1", border: "1px solid rgba(136, 136, 136, 0.2)" }),
@@ -462,13 +462,13 @@ export default function ScraperPage() {
                     >
                       {post.contentType}
                     </span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#6B6B6B" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#6b7280" }}>
                       {timeAgo(post.postedAt)}
                     </span>
                   </div>
                   <p
                     className="line-clamp-2 leading-snug"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#FAFAFA" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#f0f2f5" }}
                   >
                     {post.caption || "No caption"}
                   </p>
@@ -478,10 +478,10 @@ export default function ScraperPage() {
                         {formatNumber(post.viewCount)} views
                       </span>
                     )}
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#FF2D2D" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#ff3333" }}>
                       {formatNumber(post.likeCount)} likes
                     </span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#6B6B6B" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#6b7280" }}>
                       {formatNumber(post.commentCount)} comments
                     </span>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#00D4D4", fontWeight: 600 }}>
@@ -502,7 +502,7 @@ export default function ScraperPage() {
                 className="h-4 w-4 animate-spin rounded-full"
                 style={{ border: "2px solid #333", borderTopColor: "#00D4D4" }}
               />
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5" }}>
                 Analyzing content with AI ({analysisProgress.current}/{analysisProgress.total})
               </span>
             </div>
@@ -511,7 +511,7 @@ export default function ScraperPage() {
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${Math.round((analysisProgress.current / analysisProgress.total) * 100)}%`,
-                  background: "linear-gradient(90deg, #FF2D2D, #00D4D4)",
+                  background: "linear-gradient(90deg, #ff3333, #00D4D4)",
                 }}
               />
             </div>
@@ -548,7 +548,7 @@ export default function ScraperPage() {
             fontFamily: "var(--font-heading)",
             fontSize: "22px",
             fontWeight: 700,
-            color: "#FAFAFA",
+            color: "#f0f2f5",
           }}
         >
           Creator Scraper
@@ -565,7 +565,7 @@ export default function ScraperPage() {
       <form
         onSubmit={handleSubmit}
         className="space-y-6 rounded-xl p-6"
-        style={{ border: "1px solid #1F1F1F", background: "#111111" }}
+        style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}
       >
         {/* Platform Tabs */}
         <div className="space-y-2">
@@ -587,8 +587,8 @@ export default function ScraperPage() {
                   fontSize: "13px",
                   fontWeight: 500,
                   ...(platform === p.value
-                    ? { background: "#FF2D2D", color: "#fff" }
-                    : { border: "1px solid #1F1F1F", color: "#A1A1A1", background: "#161616" }),
+                    ? { background: "#ff3333", color: "#fff" }
+                    : { border: "1px solid rgba(255, 255, 255, 0.07)", color: "#A1A1A1", background: "#161616" }),
                 }}
               >
                 {p.label}
@@ -612,13 +612,13 @@ export default function ScraperPage() {
             value={handle}
             onChange={(e) => setHandle(e.target.value)}
             placeholder="@username"
-            className="w-full max-w-md rounded-md px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+            className="w-full max-w-md rounded-md px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
             style={{
-              border: "1px solid #1F1F1F",
-              background: "#0A0A0A",
+              border: "1px solid rgba(255, 255, 255, 0.07)",
+              background: "#080a0c",
               fontFamily: "var(--font-body)",
               fontSize: "14px",
-              color: "#FAFAFA",
+              color: "#f0f2f5",
             }}
           />
         </div>
@@ -644,9 +644,9 @@ export default function ScraperPage() {
                   checked={depth === opt.value}
                   onChange={() => setDepth(opt.value)}
                   className="h-4 w-4"
-                  style={{ accentColor: "#FF2D2D" }}
+                  style={{ accentColor: "#ff3333" }}
                 />
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#FAFAFA" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#f0f2f5" }}>
                   {opt.label}
                 </span>
               </label>
@@ -659,7 +659,7 @@ export default function ScraperPage() {
           type="submit"
           className="rounded-lg px-6 py-2.5 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/10 hover:scale-[1.02]"
           style={{
-            background: "#FF2D2D",
+            background: "#ff3333",
             fontFamily: "var(--font-body)",
             fontSize: "14px",
             fontWeight: 600,
@@ -678,7 +678,7 @@ export default function ScraperPage() {
               fontFamily: "var(--font-heading)",
               fontSize: "16px",
               fontWeight: 600,
-              color: "#FAFAFA",
+              color: "#f0f2f5",
             }}
           >
             Scraped Creators
@@ -710,45 +710,45 @@ export default function ScraperPage() {
             No creators scraped yet. Add a handle above to get started.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid #1F1F1F", background: "#111111" }}>
+          <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}>
             <table className="w-full text-left">
-              <thead style={{ borderBottom: "1px solid #1F1F1F" }}>
+              <thead style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.07)" }}>
                 <tr>
                   <th className="px-4 py-3">
                     <input
                       type="checkbox"
                       checked={selectedCreators.size === creators.length && creators.length > 0}
                       onChange={toggleSelectAll}
-                      style={{ accentColor: "#FF2D2D" }}
+                      style={{ accentColor: "#ff3333" }}
                     />
                   </th>
                   <th
                     className="px-4 py-3"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
                     Handle
                   </th>
                   <th
                     className="px-4 py-3"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
                     Platform
                   </th>
                   <th
                     className="px-4 py-3"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
                     Posts
                   </th>
                   <th
                     className="px-4 py-3"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
                     Last Scraped
                   </th>
                   <th
                     className="px-4 py-3"
-                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
+                    style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
                     Actions
                   </th>
@@ -758,7 +758,7 @@ export default function ScraperPage() {
                 {creators.map((creator) => (
                   <tr
                     key={creator.id}
-                    style={{ borderBottom: "1px solid #1A1A1A" }}
+                    style={{ borderBottom: "1px solid #141820" }}
                     className={`transition-colors ${selectedCreators.has(creator.id) ? "bg-[#161616]" : "hover:bg-[#161616]"}`}
                   >
                     <td className="px-4 py-3">
@@ -766,17 +766,17 @@ export default function ScraperPage() {
                         type="checkbox"
                         checked={selectedCreators.has(creator.id)}
                         onChange={() => toggleSelect(creator.id)}
-                        style={{ accentColor: "#FF2D2D" }}
+                        style={{ accentColor: "#ff3333" }}
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#FAFAFA" }}>
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#f0f2f5" }}>
                         @{creator.handle}
                       </span>
                       {creator.display_name && (
                         <span
                           className="ml-2"
-                          style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}
+                          style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}
                         >
                           ({creator.display_name})
                         </span>
@@ -797,12 +797,12 @@ export default function ScraperPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#FAFAFA" }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#f0f2f5" }}>
                         {creator.post_count}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#6B6B6B" }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#6b7280" }}>
                         {formatDate(creator.scraped_at)}
                       </span>
                     </td>
@@ -810,7 +810,7 @@ export default function ScraperPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleRescrape(creator)}
-                          className="rounded-lg px-3 py-1 transition-all duration-200 hover:border-[#FF2D2D]"
+                          className="rounded-lg px-3 py-1 transition-all duration-200 hover:border-[#ff3333]"
                           style={{
                             border: "1px solid #333",
                             fontFamily: "var(--font-body)",

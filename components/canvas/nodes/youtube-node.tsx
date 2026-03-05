@@ -46,7 +46,7 @@ export function YoutubeNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
               updateNodeData(id, { youtube_url: urlInput || undefined });
             }
           }}
-          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] placeholder-[#6B6B6B] focus:outline-none focus:border-[#6366F1]"
+          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] placeholder-[#6B6B6B] focus:outline-none focus:border-[#ff3333]"
           style={{ fontFamily: "var(--font-body)" }}
         />
         {thumbnail && (
@@ -63,7 +63,7 @@ export function YoutubeNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
           placeholder="Video title (optional)"
           value={(data.video_title as string) || ""}
           onChange={(e) => updateNodeData(id, { video_title: e.target.value })}
-          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] placeholder-[#6B6B6B] focus:outline-none focus:border-[#6366F1]"
+          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] placeholder-[#6B6B6B] focus:outline-none focus:border-[#ff3333]"
           style={{ fontFamily: "var(--font-body)" }}
         />
       </div>

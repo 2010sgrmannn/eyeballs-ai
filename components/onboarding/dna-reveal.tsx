@@ -20,15 +20,15 @@ export function DnaReveal({ isBuilding, results, onContinue }: DnaRevealProps) {
           animate={{ scale: [1, 1.15, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ff3333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z" />
             <path d="M19 15l.5 2 2 .5-2 .5-.5 2-.5-2-2-.5 2-.5.5-2Z" />
           </svg>
         </motion.div>
-        <p style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 600, color: "#FAFAFA" }}>
+        <p style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 600, color: "#f0f2f5" }}>
           Building your Brand DNA...
         </p>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#6B6B6B" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#6b7280" }}>
           Combining all analysis into your unique voice profile
         </p>
       </div>
@@ -38,10 +38,10 @@ export function DnaReveal({ isBuilding, results, onContinue }: DnaRevealProps) {
   if (!dna) return null;
 
   const cards = [
-    { label: "Niche", value: dna.niche, color: "#6366F1" },
+    { label: "Niche", value: dna.niche, color: "#ff3333" },
     { label: "Archetype", value: dna.creator_archetype, color: "#A855F7" },
-    { label: "Tone", value: dna.tone_descriptors?.slice(0, 3).join(", "), color: "#06B6D4" },
-    { label: "Pillars", value: dna.content_pillars?.slice(0, 3).join(", "), color: "#22C55E" },
+    { label: "Tone", value: dna.tone_descriptors?.slice(0, 3).join(", "), color: "#47d4ff" },
+    { label: "Pillars", value: dna.content_pillars?.slice(0, 3).join(", "), color: "#00e87a" },
   ];
 
   return (
@@ -51,10 +51,10 @@ export function DnaReveal({ isBuilding, results, onContinue }: DnaRevealProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "24px", fontWeight: 700, color: "#FAFAFA" }}>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "24px", fontWeight: 700, color: "#f0f2f5" }}>
           Your Brand DNA
         </h2>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#6B6B6B", marginTop: 4 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#6b7280", marginTop: 4 }}>
           Here&apos;s what we found from your content
         </p>
       </motion.div>
@@ -84,7 +84,7 @@ export function DnaReveal({ isBuilding, results, onContinue }: DnaRevealProps) {
             >
               {card.label}
             </span>
-            <p style={{ fontFamily: "var(--font-heading)", fontSize: "16px", fontWeight: 600, color: "#FAFAFA", marginTop: 6 }}>
+            <p style={{ fontFamily: "var(--font-heading)", fontSize: "16px", fontWeight: 600, color: "#f0f2f5", marginTop: 6 }}>
               {card.value || "Not detected"}
             </p>
           </motion.div>
@@ -102,7 +102,7 @@ export function DnaReveal({ isBuilding, results, onContinue }: DnaRevealProps) {
           onClick={onContinue}
           className="rounded-lg px-8 py-3 transition-all duration-200 hover:brightness-110 hover:scale-[1.02]"
           style={{
-            background: "linear-gradient(135deg, #6366F1, #818CF8)",
+            background: "linear-gradient(135deg, #ff3333, #ff4747)",
             color: "#fff",
             fontFamily: "var(--font-heading)",
             fontSize: "16px",

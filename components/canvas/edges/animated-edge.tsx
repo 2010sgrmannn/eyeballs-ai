@@ -58,7 +58,7 @@ export function AnimatedEdge({
         id={pathId}
         d={edgePath}
         fill="none"
-        stroke="rgba(99, 102, 241, 0.4)"
+        stroke="rgba(255, 51, 51, 0.4)"
         strokeWidth={2}
         filter={`url(#glow-${id})`}
         className={selected ? "" : "animate-pulse-opacity"}
@@ -69,7 +69,7 @@ export function AnimatedEdge({
       <path
         d={edgePath}
         fill="none"
-        stroke="rgba(99, 102, 241, 0.6)"
+        stroke="rgba(255, 51, 51, 0.6)"
         strokeWidth={1}
         style={{ opacity: selected ? 0.9 : 0.5 }}
       />
@@ -77,7 +77,7 @@ export function AnimatedEdge({
       {/* Animated particle */}
       <circle
         r={4}
-        fill="#818CF8"
+        fill="#ff4747"
         filter={`url(#particle-glow-${id})`}
       >
         <animateMotion
@@ -91,7 +91,7 @@ export function AnimatedEdge({
       {/* Second particle offset for richer effect */}
       <circle
         r={2.5}
-        fill="#A5B4FC"
+        fill="#ff9999"
         opacity={0.6}
       >
         <animateMotion

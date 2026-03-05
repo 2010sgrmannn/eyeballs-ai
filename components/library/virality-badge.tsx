@@ -6,7 +6,7 @@ export function ViralityBadge({ score }: { score: number | null }) {
         style={{
           background: "#1A1A1A",
           color: "#555",
-          fontFamily: "'JetBrains Mono', var(--font-mono)",
+          fontFamily: "'IBM Plex Mono', var(--font-mono)",
           fontSize: "11px",
           fontWeight: 600,
         }}
@@ -23,7 +23,7 @@ export function ViralityBadge({ score }: { score: number | null }) {
   if (score >= 70) {
     borderColor = "rgba(255, 45, 45, 0.3)";
     bgColor = "rgba(255, 45, 45, 0.15)";
-    textColor = "#FF2D2D";
+    textColor = "#ff3333";
   } else if (score >= 40) {
     borderColor = "rgba(161, 161, 161, 0.3)";
     bgColor = "rgba(161, 161, 161, 0.1)";
@@ -41,7 +41,7 @@ export function ViralityBadge({ score }: { score: number | null }) {
         border: `1px solid ${borderColor}`,
         background: bgColor,
         color: textColor,
-        fontFamily: "'JetBrains Mono', var(--font-mono)",
+        fontFamily: "'IBM Plex Mono', var(--font-mono)",
         fontSize: "11px",
         fontWeight: 600,
       }}

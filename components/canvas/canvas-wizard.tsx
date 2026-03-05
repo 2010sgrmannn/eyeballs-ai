@@ -258,11 +258,11 @@ export function CanvasWizard({
             </button>
 
             <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#6366F1]/10">
-                <span className="text-[#6366F1]"><IconSparkles /></span>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#ff3333]/10">
+                <span className="text-[#ff3333]"><IconSparkles /></span>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#FAFAFA]">
+                <h2 className="text-xl font-semibold text-[#f0f2f5]">
                   Hey {displayName || "there"}, what are we working on today?
                 </h2>
                 <p className="text-sm text-[#6B6B6B]">Describe your content idea</p>
@@ -276,7 +276,7 @@ export function CanvasWizard({
                 onChange={(e) => setTopic(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleStep1Submit()}
                 placeholder="e.g. Why hustle culture is making you broke..."
-                className="flex-1 rounded-xl px-4 py-3.5 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none"
+                className="flex-1 rounded-xl px-4 py-3.5 text-sm text-[#f0f2f5] placeholder-[#6B6B6B] outline-none"
                 style={{
                   background: "rgba(255, 255, 255, 0.04)",
                   border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -285,7 +285,7 @@ export function CanvasWizard({
               <button
                 onClick={handleStep1Submit}
                 disabled={!topic.trim()}
-                className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
+                className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-[#ff3333] text-white transition-opacity disabled:opacity-40"
               >
                 <IconSend />
               </button>
@@ -312,8 +312,8 @@ export function CanvasWizard({
             {/* Chat header */}
             <div className="flex items-center justify-between px-7 py-5">
               <div className="flex items-center gap-2">
-                <span className="text-[#6366F1]"><IconSparkles /></span>
-                <span className="text-sm font-medium text-[#FAFAFA]">Sharpening your idea</span>
+                <span className="text-[#ff3333]"><IconSparkles /></span>
+                <span className="text-sm font-medium text-[#f0f2f5]">Sharpening your idea</span>
               </div>
               <button
                 onClick={onClose}
@@ -337,9 +337,9 @@ export function CanvasWizard({
                     style={{
                       background:
                         msg.role === "user"
-                          ? "rgba(99, 102, 241, 0.15)"
+                          ? "rgba(255, 51, 51, 0.15)"
                           : "rgba(255, 255, 255, 0.04)",
-                      color: msg.role === "user" ? "#C7D2FE" : "#FAFAFA",
+                      color: msg.role === "user" ? "#ffb3b3" : "#f0f2f5",
                     }}
                   >
                     {msg.content}
@@ -369,7 +369,7 @@ export function CanvasWizard({
                 <button
                   onClick={handleBuildClick}
                   disabled={isBuilding}
-                  className="w-full rounded-xl bg-[#6366F1] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="w-full rounded-xl bg-[#ff3333] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {isBuilding ? "Building..." : "Looks good, let\u2019s build \u2192"}
                 </button>
@@ -387,7 +387,7 @@ export function CanvasWizard({
                     style={{
                       background: "rgba(255, 255, 255, 0.03)",
                       border: "1px solid rgba(255, 255, 255, 0.08)",
-                      color: "#FAFAFA",
+                      color: "#f0f2f5",
                     }}
                   >
                     {option}
@@ -407,7 +407,7 @@ export function CanvasWizard({
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                     placeholder="Or type something else..."
                     disabled={isLoading}
-                    className="flex-1 rounded-xl px-4 py-3 text-sm text-[#FAFAFA] placeholder-[#6B6B6B] outline-none disabled:opacity-50"
+                    className="flex-1 rounded-xl px-4 py-3 text-sm text-[#f0f2f5] placeholder-[#6B6B6B] outline-none disabled:opacity-50"
                     style={{
                       background: "rgba(255, 255, 255, 0.04)",
                       border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -416,7 +416,7 @@ export function CanvasWizard({
                   <button
                     onClick={() => sendMessage()}
                     disabled={!inputValue.trim() || isLoading}
-                    className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#6366F1] text-white transition-opacity disabled:opacity-40"
+                    className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[#ff3333] text-white transition-opacity disabled:opacity-40"
                   >
                     <IconSend />
                   </button>
@@ -444,7 +444,7 @@ export function CanvasWizard({
           >
             <div className="flex items-center justify-between px-7 py-5">
               <div>
-                <h3 className="text-base font-medium text-[#FAFAFA]">Select context</h3>
+                <h3 className="text-base font-medium text-[#f0f2f5]">Select context</h3>
                 <p className="text-sm text-[#6B6B6B]">Choose what to connect to your canvas</p>
               </div>
               <button
@@ -527,7 +527,7 @@ export function CanvasWizard({
               <button
                 onClick={handleFinalBuild}
                 disabled={isBuilding}
-                className="w-full rounded-xl bg-[#6366F1] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="w-full rounded-xl bg-[#ff3333] px-4 py-3.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               >
                 {isBuilding ? "Building..." : "Build Canvas"}
               </button>
@@ -558,14 +558,14 @@ function CheckboxItem({
       <div
         className="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
         style={{
-          background: checked ? "#6366F1" : "transparent",
-          borderColor: checked ? "#6366F1" : "rgba(255, 255, 255, 0.15)",
+          background: checked ? "#ff3333" : "transparent",
+          borderColor: checked ? "#ff3333" : "rgba(255, 255, 255, 0.15)",
         }}
       >
         {checked && <span className="text-white"><IconCheck /></span>}
       </div>
       <div className="min-w-0 flex-1">
-        <span className="block truncate text-sm text-[#FAFAFA]">{label}</span>
+        <span className="block truncate text-sm text-[#f0f2f5]">{label}</span>
         {subtitle && (
           <span className="block truncate text-xs text-[#6B6B6B]">{subtitle}</span>
         )}

@@ -8,10 +8,10 @@ import type { BrandProfile, Product, ProductType, CreatorStory, StoryEmotion, St
 // ---------------------------------------------------------------------------
 
 const TYPE_COLORS: Record<ProductType, string> = {
-  product: "#FF2D2D",
+  product: "#ff3333",
   course: "#7B2FBE",
   guide: "#00D4D4",
-  freebie: "#22C55E",
+  freebie: "#00e87a",
   coaching: "#F59E0B",
   service: "#3B82F6",
   other: "#888888",
@@ -32,8 +32,8 @@ const ALL_PRODUCT_TYPES: ProductType[] = [
 ];
 
 const CATEGORY_COLORS: Record<StoryCategory, string> = {
-  struggle: "#FF2D2D",
-  achievement: "#22C55E",
+  struggle: "#ff3333",
+  achievement: "#00e87a",
   childhood: "#F59E0B",
   relationship: "#EC4899",
   career: "#3B82F6",
@@ -97,7 +97,7 @@ function SectionHeader({ title, subtitle, action }: { title: string; subtitle: s
         >
           {title}
         </h2>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#6B6B6B" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#6b7280" }}>
           {subtitle}
         </p>
       </div>
@@ -146,14 +146,14 @@ function InlineField({
     const inputStyle = {
       background: "var(--color-background)",
       border: "1px solid var(--color-border-default)",
-      color: "#FAFAFA",
+      color: "#f0f2f5",
       fontFamily: "var(--font-body)",
       fontSize: "14px",
     };
 
     return (
       <div className="space-y-1">
-        <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+        <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
           {label}
         </label>
         {multiline ? (
@@ -196,10 +196,10 @@ function InlineField({
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-surface)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
     >
-      <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
         {label}
       </span>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: value ? "#FAFAFA" : "#555", marginTop: "2px" }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: value ? "#f0f2f5" : "#555", marginTop: "2px" }}>
         {value || placeholder || "Click to add..."}
       </p>
       <span className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#555" }}>
@@ -282,7 +282,7 @@ function LocationField({
   if (editing) {
     return (
       <div className="space-y-1 relative" ref={wrapperRef}>
-        <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+        <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
           Location
         </label>
         <input
@@ -300,7 +300,7 @@ function LocationField({
           style={{
             background: "var(--color-background)",
             border: "1px solid var(--color-border-default)",
-            color: "#FAFAFA",
+            color: "#f0f2f5",
             fontFamily: "var(--font-body)",
             fontSize: "14px",
           }}
@@ -320,8 +320,8 @@ function LocationField({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectLocation(loc)}
                 className="w-full text-left px-3 py-2 text-sm transition-colors"
-                style={{ color: "#FAFAFA", fontFamily: "var(--font-body)" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99, 102, 241, 0.15)"; }}
+                style={{ color: "#f0f2f5", fontFamily: "var(--font-body)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255, 51, 51, 0.15)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
               >
                 {loc}
@@ -341,10 +341,10 @@ function LocationField({
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-surface)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
     >
-      <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+      <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
         Location
       </span>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: value ? "#FAFAFA" : "#555", marginTop: "2px" }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: value ? "#f0f2f5" : "#555", marginTop: "2px" }}>
         {value || "e.g. Austin, TX"}
       </p>
       <span className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#555" }}>
@@ -387,7 +387,7 @@ function TagEditor({
 
   return (
     <div className="space-y-2">
-      <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6B6B6B", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+      <label style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
         {label}
       </label>
       <div className="flex flex-wrap gap-2">
@@ -433,7 +433,7 @@ function TagEditor({
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(input); } }}
           placeholder={placeholder}
           className="flex-1 rounded-lg px-3 py-2 text-sm outline-none"
-          style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+          style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
         />
       </div>
     </div>
@@ -741,9 +741,9 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={openCreateStory}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                style={{ background: "#FF2D2D", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
+                style={{ background: "#ff3333", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "#E02626"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "#FF2D2D"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#ff3333"; }}
               >
                 + Add story
               </button>
@@ -761,7 +761,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={openCreateStory}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                style={{ background: "#FF2D2D", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
+                style={{ background: "#ff3333", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
               >
                 + Add your first story
               </button>
@@ -809,7 +809,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                   {/* Title */}
                   <h4
                     className="font-medium mb-1"
-                    style={{ fontFamily: "var(--font-heading)", fontSize: "14px", color: "#FAFAFA" }}
+                    style={{ fontFamily: "var(--font-heading)", fontSize: "14px", color: "#f0f2f5" }}
                   >
                     {story.title}
                   </h4>
@@ -840,7 +840,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                       onClick={() => setShowStoryDeleteConfirm(story.id)}
                       className="p-1.5 rounded-md"
                       style={{ color: "#888888", background: "transparent", border: "none", cursor: "pointer" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = "#FF2D2D"; e.currentTarget.style.background = "rgba(255,45,45,0.08)"; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = "#ff3333"; e.currentTarget.style.background = "rgba(255,45,45,0.08)"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.color = "#888888"; e.currentTarget.style.background = "transparent"; }}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -869,9 +869,9 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={openCreateProduct}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                style={{ background: "#FF2D2D", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
+                style={{ background: "#ff3333", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "#E02626"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "#FF2D2D"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "#ff3333"; }}
               >
                 + Add offering
               </button>
@@ -889,7 +889,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={openCreateProduct}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                style={{ background: "#FF2D2D", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
+                style={{ background: "#ff3333", color: "#fff", fontFamily: "var(--font-body)", border: "none", cursor: "pointer" }}
               >
                 + Add your first offering
               </button>
@@ -934,7 +934,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                         onClick={() => setShowProductDeleteConfirm(product.id)}
                         className="p-1.5 rounded-md"
                         style={{ color: "#888888", background: "transparent", border: "none", cursor: "pointer" }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = "#FF2D2D"; e.currentTarget.style.background = "rgba(255,45,45,0.08)"; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = "#ff3333"; e.currentTarget.style.background = "rgba(255,45,45,0.08)"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.color = "#888888"; e.currentTarget.style.background = "transparent"; }}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -946,7 +946,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                   </div>
                   <h3
                     className="font-medium mb-1"
-                    style={{ fontFamily: "var(--font-heading)", fontSize: "15px", color: "#FAFAFA" }}
+                    style={{ fontFamily: "var(--font-heading)", fontSize: "15px", color: "#f0f2f5" }}
                   >
                     {product.name}
                   </h3>
@@ -957,7 +957,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                   )}
                   <div className="flex items-center gap-3 mt-auto">
                     {product.price && (
-                      <span className="inline-block px-2 py-0.5 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#FAFAFA", background: "var(--color-surface-elevated)", border: "1px solid var(--color-border-default)" }}>
+                      <span className="inline-block px-2 py-0.5 rounded" style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#f0f2f5", background: "var(--color-surface-elevated)", border: "1px solid var(--color-border-default)" }}>
                         {product.price}
                       </span>
                     )}
@@ -1005,8 +1005,8 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
             {/* Title */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
-                Title <span style={{ color: "#FF2D2D" }}>*</span>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
+                Title <span style={{ color: "#ff3333" }}>*</span>
               </label>
               <input
                 type="text"
@@ -1014,14 +1014,14 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 onChange={(e) => setStoryForm((f) => ({ ...f, title: e.target.value }))}
                 placeholder="e.g. When I failed publicly"
                 className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
-                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
               />
             </div>
 
             {/* Content */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
-                Story <span style={{ color: "#FF2D2D" }}>*</span>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
+                Story <span style={{ color: "#ff3333" }}>*</span>
               </label>
               <textarea
                 value={storyForm.content}
@@ -1029,13 +1029,13 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 placeholder="Tell the story in your own words..."
                 rows={4}
                 className="w-full rounded-lg px-3 py-2.5 text-sm outline-none resize-none"
-                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
               />
             </div>
 
             {/* Category chips */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                 Category
               </label>
               <div className="flex flex-wrap gap-2">
@@ -1064,7 +1064,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
             {/* Emotion chips */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                 Core Emotion
               </label>
               <div className="flex flex-wrap gap-2">
@@ -1093,7 +1093,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
             {/* Time period */}
             <div className="mb-6">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                 Time Period
               </label>
               <input
@@ -1102,7 +1102,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 onChange={(e) => setStoryForm((f) => ({ ...f, time_period: e.target.value }))}
                 placeholder='e.g. "age 23", "2019", "college"'
                 className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
-                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
               />
             </div>
 
@@ -1121,7 +1121,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 className="px-4 py-2 rounded-lg text-sm font-medium"
                 style={{
                   fontFamily: "var(--font-body)",
-                  background: (!storyForm.title.trim() || !storyForm.content.trim() || savingStory) ? "#661212" : "#FF2D2D",
+                  background: (!storyForm.title.trim() || !storyForm.content.trim() || savingStory) ? "#661212" : "#ff3333",
                   color: "#fff",
                   border: "none",
                   cursor: (!storyForm.title.trim() || !storyForm.content.trim() || savingStory) ? "not-allowed" : "pointer",
@@ -1164,7 +1164,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={() => handleDeleteStory(showStoryDeleteConfirm)}
                 className="px-4 py-2 rounded-lg text-sm font-medium"
-                style={{ fontFamily: "var(--font-body)", background: "#FF2D2D", color: "#fff", border: "none", cursor: "pointer" }}
+                style={{ fontFamily: "var(--font-body)", background: "#ff3333", color: "#fff", border: "none", cursor: "pointer" }}
               >
                 Delete
               </button>
@@ -1196,8 +1196,8 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
             {/* Name */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
-                Name <span style={{ color: "#FF2D2D" }}>*</span>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
+                Name <span style={{ color: "#ff3333" }}>*</span>
               </label>
               <input
                 type="text"
@@ -1205,13 +1205,13 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 onChange={(e) => setProductForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Instagram Growth Guide"
                 className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
-                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
               />
             </div>
 
             {/* Type chips */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                 Type
               </label>
               <div className="flex flex-wrap gap-2">
@@ -1240,7 +1240,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
 
             {/* Description */}
             <div className="mb-4">
-              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+              <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                 Description
               </label>
               <textarea
@@ -1249,14 +1249,14 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 placeholder="Brief description..."
                 rows={3}
                 className="w-full rounded-lg px-3 py-2.5 text-sm outline-none resize-none"
-                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
               />
             </div>
 
             {/* Price + URL */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+                <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                   Price
                 </label>
                 <input
@@ -1265,11 +1265,11 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                   onChange={(e) => setProductForm((f) => ({ ...f, price: e.target.value }))}
                   placeholder="e.g. $49"
                   className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
-                  style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-mono)" }}
+                  style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-mono)" }}
                 />
               </div>
               <div>
-                <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500 }}>
+                <label className="block mb-1.5" style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500 }}>
                   URL
                 </label>
                 <input
@@ -1278,7 +1278,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                   onChange={(e) => setProductForm((f) => ({ ...f, url: e.target.value }))}
                   placeholder="https://..."
                   className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
-                  style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#FAFAFA", fontFamily: "var(--font-body)" }}
+                  style={{ background: "var(--color-background)", border: "1px solid var(--color-border-default)", color: "#f0f2f5", fontFamily: "var(--font-body)" }}
                 />
               </div>
             </div>
@@ -1298,7 +1298,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
                 className="px-4 py-2 rounded-lg text-sm font-medium"
                 style={{
                   fontFamily: "var(--font-body)",
-                  background: (!productForm.name.trim() || savingProduct) ? "#661212" : "#FF2D2D",
+                  background: (!productForm.name.trim() || savingProduct) ? "#661212" : "#ff3333",
                   color: "#fff",
                   border: "none",
                   cursor: (!productForm.name.trim() || savingProduct) ? "not-allowed" : "pointer",
@@ -1341,7 +1341,7 @@ export function ContextView({ initialProfile, initialStories, initialProducts }:
               <button
                 onClick={() => handleDeleteProduct(showProductDeleteConfirm)}
                 className="px-4 py-2 rounded-lg text-sm font-medium"
-                style={{ fontFamily: "var(--font-body)", background: "#FF2D2D", color: "#fff", border: "none", cursor: "pointer" }}
+                style={{ fontFamily: "var(--font-body)", background: "#ff3333", color: "#fff", border: "none", cursor: "pointer" }}
               >
                 Delete
               </button>

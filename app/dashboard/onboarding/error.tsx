@@ -33,7 +33,7 @@ export default function OnboardingError({
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#FF2D2D"
+            stroke="#ff3333"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -76,7 +76,7 @@ export default function OnboardingError({
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "14px",
-              background: "#FF2D2D",
+              background: "#ff3333",
               color: "#fff",
             }}
           >

@@ -40,9 +40,9 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
         >
           {/* Traffic lights */}
           <div className="flex gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full" style={{ background: "#EF4444" }} />
+            <div className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff3333" }} />
             <div className="h-2.5 w-2.5 rounded-full" style={{ background: "#EAB308" }} />
-            <div className="h-2.5 w-2.5 rounded-full" style={{ background: "#22C55E" }} />
+            <div className="h-2.5 w-2.5 rounded-full" style={{ background: "#00e87a" }} />
           </div>
 
           {/* URL bar */}
@@ -64,7 +64,7 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
               <motion.span
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.6, repeat: Infinity }}
-                style={{ color: "#6366F1" }}
+                style={{ color: "#ff3333" }}
               >
                 |
               </motion.span>
@@ -78,11 +78,11 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
           <div className="flex items-center gap-5">
             <div
               className="h-16 w-16 rounded-full animate-shimmer"
-              style={{ background: "#1C2840", border: "2px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "#1a1f28", border: "2px solid rgba(255,255,255,0.06)" }}
             />
             <div className="flex-1 space-y-2">
-              <div className="h-4 w-32 rounded animate-shimmer" style={{ background: "#1C2840" }} />
-              <div className="h-3 w-48 rounded animate-shimmer" style={{ background: "#162030" }} />
+              <div className="h-4 w-32 rounded animate-shimmer" style={{ background: "#1a1f28" }} />
+              <div className="h-3 w-48 rounded animate-shimmer" style={{ background: "#141820" }} />
             </div>
           </div>
 
@@ -99,7 +99,7 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
             </span>
             <motion.span
               key={reelsScraped}
-              initial={{ scale: 1.3, color: "#6366F1" }}
+              initial={{ scale: 1.3, color: "#ff3333" }}
               animate={{ scale: 1, color: "#A1A1A1" }}
               style={{
                 fontFamily: "var(--font-mono)",
@@ -122,12 +122,12 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
                   initial={{ opacity: 0.3 }}
                   animate={{
                     opacity: isFound ? 1 : 0.3,
-                    borderColor: isFound ? "rgba(99, 102, 241, 0.5)" : "rgba(255,255,255,0.04)",
+                    borderColor: isFound ? "rgba(255, 51, 51, 0.5)" : "rgba(255,255,255,0.04)",
                   }}
                   transition={{ duration: 0.3 }}
                   style={{
                     background: isFound
-                      ? "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.1))"
+                      ? "linear-gradient(135deg, rgba(255,51,51,0.15), rgba(71,212,255,0.1))"
                       : "#111827",
                     border: "1px solid rgba(255,255,255,0.04)",
                   }}
@@ -139,7 +139,7 @@ export function MockBrowserCard({ handle, reelsScraped, reelsRequested }: MockBr
                       transition={motionConfig.spring.bouncy}
                       className="flex h-full items-center justify-center"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polygon points="5 3 19 12 5 21 5 3" />
                       </svg>
                     </motion.div>

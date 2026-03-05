@@ -36,8 +36,8 @@ export function FolderPicker({
       <div
         className="relative z-[60] w-64 overflow-hidden"
         style={{
-          background: "#1A1A1A",
-          border: "1px solid #1F1F1F",
+          background: "#141820",
+          border: "1px solid rgba(255, 255, 255, 0.07)",
           borderRadius: "8px",
           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.5)",
         }}
@@ -65,7 +65,7 @@ export function FolderPicker({
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
                 color: "#E0E0E0",
-                borderBottom: "1px solid #1F1F1F",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.07)",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.background = "#2A2A2A";
@@ -82,7 +82,7 @@ export function FolderPicker({
         {/* Create new folder */}
         <div
           className="flex items-center gap-2 px-3 py-2"
-          style={{ borderTop: "1px solid #1F1F1F" }}
+          style={{ borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
         >
           <input
             type="text"
@@ -97,8 +97,8 @@ export function FolderPicker({
               fontFamily: "var(--font-body)",
               fontSize: "12px",
               color: "#E0E0E0",
-              background: "#0A0A0A",
-              border: "1px solid #1F1F1F",
+              background: "#080a0c",
+              border: "1px solid rgba(255, 255, 255, 0.07)",
               borderRadius: "4px",
             }}
           />
@@ -107,7 +107,7 @@ export function FolderPicker({
             onClick={handleCreate}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded transition-colors duration-150"
             style={{
-              background: newFolderName.trim() ? "#FF2D2D" : "#333",
+              background: newFolderName.trim() ? "#ff3333" : "#333",
               color: "#fff",
               fontFamily: "var(--font-mono)",
               fontSize: "14px",

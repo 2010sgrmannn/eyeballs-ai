@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main
       className="flex min-h-screen flex-col items-center justify-center"
-      style={{ background: "#0A0A0A" }}
+      style={{ background: "#080a0c" }}
     >
       <h1
         style={{
@@ -36,7 +36,7 @@ export default function Home() {
             fontSize: "14px",
             fontWeight: 500,
             border: "1px solid #333333",
-            color: "#FAFAFA",
+            color: "#f0f2f5",
             background: "transparent",
           }}
         >
@@ -49,9 +49,9 @@ export default function Home() {
             fontFamily: "var(--font-body)",
             fontSize: "14px",
             fontWeight: 500,
-            border: "1px solid #FF2D2D",
+            border: "1px solid #ff3333",
             color: "#FFFFFF",
-            background: "#FF2D2D",
+            background: "#ff3333",
           }}
         >
           Sign up

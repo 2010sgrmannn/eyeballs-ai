@@ -37,9 +37,9 @@ export function DashboardShell({ userEmail, children }: DashboardShellProps) {
         {/* Main content */}
         <main className="relative flex-1 overflow-y-auto p-6 z-10 h-full" data-testid="main-content">
           {/* Ambient orbs */}
-          <div className="ambient-orb ambient-orb-indigo" />
-          <div className="ambient-orb ambient-orb-purple" />
-          <div className="ambient-orb ambient-orb-cyan" />
+          <div className="ambient-orb ambient-orb-red" />
+          <div className="ambient-orb ambient-orb-green" />
+          <div className="ambient-orb ambient-orb-blue" />
 
           {children}
         </main>

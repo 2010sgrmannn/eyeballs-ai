@@ -11,10 +11,10 @@ interface TranscriptionFlowProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Hook": "#6366F1",
+  "Hook": "#ff3333",
   "Story": "#A855F7",
-  "Tutorial": "#06B6D4",
-  "Pitch": "#22C55E",
+  "Tutorial": "#47d4ff",
+  "Pitch": "#00e87a",
   "Q&A": "#EAB308",
 };
 
@@ -33,7 +33,7 @@ export function TranscriptionFlow({
       <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
         {/* Left: Reels column */}
         <div className="flex-1 space-y-2">
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
             Reels
           </span>
           <div className="space-y-2">
@@ -47,11 +47,11 @@ export function TranscriptionFlow({
                   transition={{ delay: i * 0.1, ...motionConfig.spring.gentle }}
                   className="flex items-center gap-3 rounded-lg px-3 py-2"
                   style={{
-                    background: isTranscribed ? "rgba(99,102,241,0.1)" : "#111827",
-                    border: `1px solid ${isTranscribed ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.04)"}`,
+                    background: isTranscribed ? "rgba(255,51,51,0.1)" : "#111827",
+                    border: `1px solid ${isTranscribed ? "rgba(255,51,51,0.3)" : "rgba(255,255,255,0.04)"}`,
                   }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isTranscribed ? "#6366F1" : "#333"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isTranscribed ? "#ff3333" : "#333"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: isTranscribed ? "#A1A1A1" : "#333" }}>
@@ -66,11 +66,11 @@ export function TranscriptionFlow({
                       transition={motionConfig.spring.bouncy}
                       className="ml-auto rounded-full px-2 py-0.5"
                       style={{
-                        background: `${CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#6366F1"}20`,
-                        border: `1px solid ${CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#6366F1"}50`,
+                        background: `${CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#ff3333"}20`,
+                        border: `1px solid ${CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#ff3333"}50`,
                         fontFamily: "var(--font-mono)",
                         fontSize: "10px",
-                        color: CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#6366F1",
+                        color: CATEGORY_COLORS[MOCK_CATEGORIES[i]] || "#ff3333",
                       }}
                     >
                       {MOCK_CATEGORIES[i]}
@@ -92,7 +92,7 @@ export function TranscriptionFlow({
                 <motion.g key={i}>
                   <motion.path
                     d={`M 0 ${y} C 30 ${y}, 50 ${y}, 80 ${y}`}
-                    stroke={isActive ? "#6366F1" : "#1C2840"}
+                    stroke={isActive ? "#ff3333" : "#1a1f28"}
                     strokeWidth="1.5"
                     fill="none"
                     initial={{ pathLength: 0 }}
@@ -102,7 +102,7 @@ export function TranscriptionFlow({
                   {isActive && (
                     <motion.circle
                       r="3"
-                      fill="#6366F1"
+                      fill="#ff3333"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: [0, 1, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
@@ -118,7 +118,7 @@ export function TranscriptionFlow({
                   {isActive && (
                     <motion.polygon
                       points={`75,${y - 4} 80,${y} 75,${y + 4}`}
-                      fill="#6366F1"
+                      fill="#ff3333"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.15 + 0.4 }}
@@ -132,7 +132,7 @@ export function TranscriptionFlow({
 
         {/* Right: Transcripts column */}
         <div className="flex-1 space-y-2">
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
             Transcripts
           </span>
           <div className="space-y-2">
@@ -146,17 +146,17 @@ export function TranscriptionFlow({
                   transition={{ delay: i * 0.15 + 0.3, ...motionConfig.spring.gentle }}
                   className="rounded-lg px-3 py-2"
                   style={{
-                    background: isReady ? "rgba(6,182,212,0.08)" : "#111827",
-                    border: `1px solid ${isReady ? "rgba(6,182,212,0.2)" : "rgba(255,255,255,0.04)"}`,
+                    background: isReady ? "rgba(71,212,255,0.08)" : "#111827",
+                    border: `1px solid ${isReady ? "rgba(71,212,255,0.2)" : "rgba(255,255,255,0.04)"}`,
                   }}
                 >
                   {isReady ? (
                     <div className="space-y-1">
-                      <div className="h-2 w-full rounded" style={{ background: "rgba(6,182,212,0.15)" }} />
-                      <div className="h-2 w-3/4 rounded" style={{ background: "rgba(6,182,212,0.1)" }} />
+                      <div className="h-2 w-full rounded" style={{ background: "rgba(71,212,255,0.15)" }} />
+                      <div className="h-2 w-3/4 rounded" style={{ background: "rgba(71,212,255,0.1)" }} />
                     </div>
                   ) : (
-                    <div className="h-6 animate-shimmer rounded" style={{ background: "#1C2840" }} />
+                    <div className="h-6 animate-shimmer rounded" style={{ background: "#1a1f28" }} />
                   )}
                 </motion.div>
               );
@@ -171,7 +171,7 @@ export function TranscriptionFlow({
           key={reelsTranscribed}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
-          style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#6366F1" }}
+          style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#ff3333" }}
         >
           {reelsTranscribed}/{reelsScraped} transcribed
           {showClassification && ` \u2022 ${reelsClassified}/${reelsScraped} classified`}

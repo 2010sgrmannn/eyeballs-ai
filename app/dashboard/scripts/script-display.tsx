@@ -38,9 +38,9 @@ export function ScriptDisplay({
   const [editCta, setEditCta] = useState(scriptBody.cta);
 
   const inputStyle = {
-    border: "1px solid #1F1F1F",
-    background: "#0A0A0A",
-    color: "#FAFAFA",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    background: "#080a0c",
+    color: "#f0f2f5",
     fontFamily: "var(--font-body)",
     fontSize: "14px",
     transition: "border-color 0.2s",
@@ -105,19 +105,19 @@ export function ScriptDisplay({
   return (
     <div
       className="space-y-4 p-4 rounded-lg"
-      style={{ border: "1px solid #1F1F1F", background: "#0A0A0A" }}
+      style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#080a0c" }}
     >
       {editing ? (
         <div className="space-y-4">
           <div className="space-y-2">
-            <label style={{ ...sectionLabelStyle, color: "#FF2D2D" }}>
+            <label style={{ ...sectionLabelStyle, color: "#ff3333" }}>
               Hook
             </label>
             <textarea
               value={editHook}
               onChange={(e) => setEditHook(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -129,19 +129,19 @@ export function ScriptDisplay({
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
               rows={6}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
           <div className="space-y-2">
-            <label style={{ ...sectionLabelStyle, color: "#FF2D2D" }}>
+            <label style={{ ...sectionLabelStyle, color: "#ff3333" }}>
               CTA
             </label>
             <textarea
               value={editCta}
               onChange={(e) => setEditCta(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -151,8 +151,8 @@ export function ScriptDisplay({
               disabled={saving}
               className="px-4 py-1.5 rounded-lg transition-all hover:opacity-90 disabled:opacity-50"
               style={{
-                border: "1px solid #FF2D2D",
-                background: "#FF2D2D",
+                border: "1px solid #ff3333",
+                background: "#ff3333",
                 color: "#FFFFFF",
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
@@ -173,12 +173,12 @@ export function ScriptDisplay({
       ) : (
         <>
           <div>
-            <h3 className="mb-1" style={{ ...sectionLabelStyle, color: "#FF2D2D" }}>
+            <h3 className="mb-1" style={{ ...sectionLabelStyle, color: "#ff3333" }}>
               Hook
             </h3>
             <p
               className="whitespace-pre-wrap"
-              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA" }}
+              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5" }}
             >
               {scriptBody.hook}
             </p>
@@ -189,33 +189,33 @@ export function ScriptDisplay({
             </h3>
             <p
               className="whitespace-pre-wrap"
-              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA" }}
+              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5" }}
             >
               {scriptBody.body}
             </p>
           </div>
           <div>
-            <h3 className="mb-1" style={{ ...sectionLabelStyle, color: "#FF2D2D" }}>
+            <h3 className="mb-1" style={{ ...sectionLabelStyle, color: "#ff3333" }}>
               CTA
             </h3>
             <p
               className="whitespace-pre-wrap"
-              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA" }}
+              style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5" }}
             >
               {scriptBody.cta}
             </p>
           </div>
           <div
             className="flex gap-2 pt-4"
-            style={{ borderTop: "1px solid #1F1F1F" }}
+            style={{ borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
           >
             <button
               onClick={handleCopy}
               className="px-3 py-1.5 rounded-lg transition-all"
               style={{
                 ...buttonStyle,
-                color: copied ? "#FF2D2D" : "#A1A1A1",
-                borderColor: copied ? "#FF2D2D" : "#333333",
+                color: copied ? "#ff3333" : "#A1A1A1",
+                borderColor: copied ? "#ff3333" : "#333333",
               }}
             >
               {copied ? "Copied!" : "Copy"}

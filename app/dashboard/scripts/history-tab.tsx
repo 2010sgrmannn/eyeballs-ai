@@ -53,7 +53,7 @@ export function HistoryTab({
         <div
           key={script.id}
           className="rounded-lg"
-          style={{ border: "1px solid #1F1F1F", background: "#111111" }}
+          style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#0e1115" }}
         >
           <button
             onClick={() =>
@@ -65,7 +65,7 @@ export function HistoryTab({
               <div className="flex items-center gap-2">
                 <span
                   className="truncate"
-                  style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#FAFAFA" }}
+                  style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#f0f2f5" }}
                 >
                   {script.title || "Untitled Script"}
                 </span>
@@ -73,7 +73,7 @@ export function HistoryTab({
                   <span
                     className="shrink-0 px-2 py-0.5 rounded"
                     style={{
-                      border: "1px solid #1F1F1F",
+                      border: "1px solid rgba(255, 255, 255, 0.07)",
                       background: "rgba(123, 47, 190, 0.08)",
                       fontFamily: "var(--font-mono)",
                       fontSize: "11px",
@@ -87,13 +87,13 @@ export function HistoryTab({
               </div>
               <p
                 className="mt-0.5 truncate"
-                style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#6B6B6B" }}
+                style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#6b7280" }}
               >
                 {script.topic} &middot;{" "}
                 {new Date(script.created_at).toLocaleDateString()}
               </p>
             </div>
-            <span style={{ color: "#6B6B6B" }}>
+            <span style={{ color: "#6b7280" }}>
               {expandedId === script.id ? "\u25B2" : "\u25BC"}
             </span>
           </button>
@@ -101,7 +101,7 @@ export function HistoryTab({
           {expandedId === script.id && (
             <div
               className="px-4 py-4"
-              style={{ borderTop: "1px solid #1F1F1F" }}
+              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
             >
               <ScriptDisplay
                 script={script}
@@ -120,7 +120,7 @@ export function HistoryTab({
                       style={{
                         border: "1px solid rgba(239, 68, 68, 0.3)",
                         background: "rgba(239, 68, 68, 0.08)",
-                        color: "#EF4444",
+                        color: "#ff3333",
                         fontFamily: "var(--font-body)",
                         fontSize: "13px",
                         fontWeight: 500,
@@ -148,7 +148,7 @@ export function HistoryTab({
                     className="px-3 py-1 rounded-lg transition-all"
                     style={{
                       border: "1px solid rgba(239, 68, 68, 0.2)",
-                      color: "#EF4444",
+                      color: "#ff3333",
                       fontFamily: "var(--font-body)",
                       fontSize: "13px",
                       fontWeight: 500,

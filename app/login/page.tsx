@@ -52,7 +52,7 @@ export default function LoginPage() {
   return (
     <main
       className="flex min-h-screen flex-col items-center justify-center px-4"
-      style={{ background: "#0A0A0A" }}
+      style={{ background: "#080a0c" }}
     >
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
@@ -82,7 +82,7 @@ export default function LoginPage() {
               style={{
                 border: "1px solid rgba(239, 68, 68, 0.3)",
                 background: "rgba(239, 68, 68, 0.08)",
-                color: "#EF4444",
+                color: "#ff3333",
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
               }}
@@ -110,11 +110,11 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
-              className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={{
-                border: "1px solid #1F1F1F",
-                background: "#111111",
-                color: "#FAFAFA",
+                border: "1px solid rgba(255, 255, 255, 0.07)",
+                background: "#0e1115",
+                color: "#f0f2f5",
                 fontFamily: "var(--font-body)",
                 fontSize: "14px",
                 transition: "border-color 0.2s",
@@ -141,11 +141,11 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Your password"
               autoComplete="current-password"
-              className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={{
-                border: "1px solid #1F1F1F",
-                background: "#111111",
-                color: "#FAFAFA",
+                border: "1px solid rgba(255, 255, 255, 0.07)",
+                background: "#0e1115",
+                color: "#f0f2f5",
                 fontFamily: "var(--font-body)",
                 fontSize: "14px",
                 transition: "border-color 0.2s",
@@ -158,8 +158,8 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full px-4 py-2.5 rounded-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             style={{
-              border: "1px solid #FF2D2D",
-              background: "#FF2D2D",
+              border: "1px solid #ff3333",
+              background: "#ff3333",
               color: "#FFFFFF",
               fontFamily: "var(--font-body)",
               fontSize: "14px",
@@ -178,7 +178,7 @@ export default function LoginPage() {
           <Link
             href="/signup"
             className="transition-colors hover:text-[#FF5555]"
-            style={{ color: "#FF2D2D" }}
+            style={{ color: "#ff3333" }}
           >
             Sign up
           </Link>

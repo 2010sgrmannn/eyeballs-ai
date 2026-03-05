@@ -99,9 +99,9 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
   }
 
   const inputStyle = {
-    border: "1px solid #1F1F1F",
-    background: "#111111",
-    color: "#FAFAFA",
+    border: "1px solid rgba(255, 255, 255, 0.07)",
+    background: "#0e1115",
+    color: "#f0f2f5",
     fontFamily: "var(--font-body)",
     fontSize: "14px",
     transition: "border-color 0.2s",
@@ -110,7 +110,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
   const labelStyle = {
     fontFamily: "var(--font-body)",
     fontSize: "12px",
-    color: "#6B6B6B",
+    color: "#6b7280",
     fontWeight: 500 as const,
     letterSpacing: "0.5px",
     textTransform: "uppercase" as const,
@@ -126,7 +126,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
             style={{
               border: "1px solid rgba(239, 68, 68, 0.3)",
               background: "rgba(239, 68, 68, 0.08)",
-              color: "#EF4444",
+              color: "#ff3333",
               fontFamily: "var(--font-body)",
               fontSize: "13px",
             }}
@@ -145,7 +145,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
             onChange={(e) => setTopic(e.target.value)}
             placeholder="e.g., 5 productivity tips that doubled my output as a solopreneur..."
             rows={3}
-            className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+            className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
             style={inputStyle}
           />
         </div>
@@ -159,7 +159,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
               id="niche"
               value={nicheId}
               onChange={(e) => setNicheId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             >
               <option value="">All niches</option>
@@ -181,7 +181,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
               id="platform"
               value={platform}
               onChange={(e) => setPlatform(e.target.value as Platform)}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             >
               {PLATFORMS.map((p) => (
@@ -200,7 +200,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
               id="style"
               value={scriptStyle}
               onChange={(e) => setScriptStyle(e.target.value as ScriptStyle)}
-              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF2D2D]"
+              className="w-full px-3 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#ff3333]"
               style={inputStyle}
             >
               {STYLES.map((s) => (
@@ -217,8 +217,8 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
           disabled={loading}
           className="px-6 py-2.5 rounded-lg transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           style={{
-            border: "1px solid #FF2D2D",
-            background: "#FF2D2D",
+            border: "1px solid #ff3333",
+            background: "#ff3333",
             color: "#FFFFFF",
             fontFamily: "var(--font-body)",
             fontSize: "14px",
@@ -233,7 +233,7 @@ export function GenerateTab({ niches, onScriptGenerated }: GenerateTabProps) {
         <div className="mt-8">
           <h2
             className="mb-4"
-            style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700, color: "#FAFAFA" }}
+            style={{ fontFamily: "var(--font-heading)", fontSize: "18px", fontWeight: 700, color: "#f0f2f5" }}
           >
             Generated Script
           </h2>

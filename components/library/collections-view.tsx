@@ -184,7 +184,7 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
       {/* Tab bar */}
       <div
         className="flex items-center gap-1 overflow-x-auto pb-px"
-        style={{ borderBottom: "1px solid #1F1F1F" }}
+        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.07)" }}
       >
         {/* Favorites tab */}
         <button
@@ -195,13 +195,13 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
             fontFamily: "var(--font-body)",
             fontSize: "13px",
             fontWeight: 500,
-            color: activeTab === "favorites" ? "#FF2D2D" : "#888",
-            borderBottom: activeTab === "favorites" ? "2px solid #FF2D2D" : "2px solid transparent",
+            color: activeTab === "favorites" ? "#ff3333" : "#888",
+            borderBottom: activeTab === "favorites" ? "2px solid #ff3333" : "2px solid transparent",
             background: "transparent",
           }}
         >
           <span className="flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill={activeTab === "favorites" ? "#FF2D2D" : "none"} stroke={activeTab === "favorites" ? "#FF2D2D" : "#888"} strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={activeTab === "favorites" ? "#ff3333" : "none"} stroke={activeTab === "favorites" ? "#ff3333" : "#888"} strokeWidth="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
             Favorites
@@ -265,7 +265,7 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
                 fontFamily: "var(--font-body)",
                 fontSize: "12px",
                 color: "#E0E0E0",
-                background: "#0A0A0A",
+                background: "#080a0c",
                 border: "1px solid #2A2A2A",
                 borderRadius: "4px",
               }}
@@ -275,7 +275,7 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
               onClick={handleCreateFolder}
               className="flex h-6 w-6 items-center justify-center rounded"
               style={{
-                background: newFolderName.trim() ? "#FF2D2D" : "#333",
+                background: newFolderName.trim() ? "#ff3333" : "#333",
                 color: "#fff",
                 fontSize: "14px",
               }}
@@ -329,7 +329,7 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
           >
             {loading ? "Loading..." : (
               <>
-                <span style={{ fontFamily: "var(--font-mono)", color: "#FF2D2D" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "#ff3333" }}>
                   {result.totalCount}
                 </span>{" "}
                 item{result.totalCount !== 1 ? "s" : ""}
@@ -343,7 +343,7 @@ export function CollectionsView({ initialFolders }: CollectionsViewProps) {
       {result.data.length === 0 && !loading ? (
         <div
           className="flex flex-col items-center justify-center rounded-lg py-16"
-          style={{ border: "1px dashed #1F1F1F" }}
+          style={{ border: "1px dashed rgba(255, 255, 255, 0.07)" }}
         >
           {activeTab === "favorites" ? (
             <>

@@ -118,7 +118,7 @@ export function CanvasSidebar({ onNewCanvas, onSwitchCanvas }: CanvasSidebarProp
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm font-medium text-[#FAFAFA]">Canvases</span>
+            <span className="text-sm font-medium text-[#f0f2f5]">Canvases</span>
             <div className="flex items-center gap-1">
               <button
                 onClick={onNewCanvas}
@@ -155,9 +155,9 @@ export function CanvasSidebar({ onNewCanvas, onSwitchCanvas }: CanvasSidebarProp
                   onMouseLeave={() => setHoveredId(null)}
                   className="group relative mb-0.5 flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm transition-colors"
                   style={{
-                    background: isActive ? "rgba(99, 102, 241, 0.1)" : "transparent",
-                    borderLeft: isActive ? "2px solid #6366F1" : "2px solid transparent",
-                    color: isActive ? "#FAFAFA" : "#A1A1A1",
+                    background: isActive ? "rgba(255, 51, 51, 0.1)" : "transparent",
+                    borderLeft: isActive ? "2px solid #ff3333" : "2px solid transparent",
+                    color: isActive ? "#f0f2f5" : "#A1A1A1",
                   }}
                 >
                   {isEditing ? (
@@ -170,7 +170,7 @@ export function CanvasSidebar({ onNewCanvas, onSwitchCanvas }: CanvasSidebarProp
                         if (e.key === "Enter") commitRename();
                         if (e.key === "Escape") setEditingId(null);
                       }}
-                      className="w-full bg-transparent text-sm text-[#FAFAFA] outline-none"
+                      className="w-full bg-transparent text-sm text-[#f0f2f5] outline-none"
                       onClick={(e) => e.stopPropagation()}
                     />
                   ) : (

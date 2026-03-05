@@ -55,7 +55,7 @@ export function ProfileAnalysisScreen({
             fontFamily: "var(--font-heading)",
             fontSize: "clamp(20px, 3vw, 28px)",
             fontWeight: 700,
-            color: "#FAFAFA",
+            color: "#f0f2f5",
           }}
         >
           {PHASE_LABELS[phase] || "Analyzing..."}
@@ -158,7 +158,7 @@ export function ProfileAnalysisScreen({
                 onClick={onRetry}
                 className="rounded-lg px-6 py-2 transition-all hover:brightness-110"
                 style={{
-                  background: "#6366F1",
+                  background: "#ff3333",
                   color: "#fff",
                   fontFamily: "var(--font-body)",
                   fontSize: "14px",
@@ -172,7 +172,7 @@ export function ProfileAnalysisScreen({
               <button
                 type="button"
                 onClick={onBack}
-                className="rounded-lg px-6 py-2 transition-all hover:border-[#6366F1]"
+                className="rounded-lg px-6 py-2 transition-all hover:border-[#ff3333]"
                 style={{
                   border: "1px solid #333",
                   color: "#A1A1A1",

@@ -1,53 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:ital,wght@1,700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  /* Background hierarchy — dark blue-gray base (NOT pure black) */
-  --color-background: #09111A;
-  --color-foreground: #FAFAFA;
-  --color-surface: #0F1923;
-  --color-surface-card: #162030;
-  --color-surface-elevated: #1C2840;
-  --color-surface-overlay: #223050;
+  /* Background hierarchy — near-black base */
+  --color-background: #080a0c;
+  --color-foreground: #f0f2f5;
+  --color-surface: #0e1115;
+  --color-surface-card: #141820;
+  --color-surface-elevated: #1a1f28;
+  --color-surface-overlay: #212730;
 
   /* Text hierarchy */
-  --color-text-primary: #FAFAFA;
-  --color-text-secondary: #A1A1A1;
-  --color-text-muted: #6B6B6B;
+  --color-text-primary: #f0f2f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #6b7280;
   --color-text-disabled: #484848;
 
   /* Accent colors */
-  --color-accent: #6366F1;
-  --color-accent-hover: #818CF8;
-  --color-accent-muted: rgba(99, 102, 241, 0.1);
+  --color-accent: #ff3333;
+  --color-accent-hover: #ff4747;
+  --color-accent-muted: rgba(255, 51, 51, 0.1);
+  --color-cta: #00e87a;
+  --color-cta-hover: #00ff88;
+  --color-cta-muted: rgba(0, 232, 122, 0.1);
+  --color-info: #47d4ff;
+  --color-info-muted: rgba(71, 212, 255, 0.1);
   --color-secondary: #7B2FBE;
   --color-secondary-muted: rgba(123, 47, 190, 0.1);
-  --color-cyan: #06B6D4;
-  --color-cyan-muted: rgba(6, 182, 212, 0.1);
-  --color-success: #22C55E;
-  --color-success-muted: rgba(34, 197, 94, 0.1);
+  --color-cyan: #47d4ff;
+  --color-cyan-muted: rgba(71, 212, 255, 0.1);
+  --color-success: #00e87a;
+  --color-success-muted: rgba(0, 232, 122, 0.1);
   --color-warning: #EAB308;
   --color-warning-muted: rgba(234, 179, 8, 0.1);
-  --color-danger: #EF4444;
-  --color-danger-muted: rgba(239, 68, 68, 0.1);
+  --color-danger: #ff3333;
+  --color-danger-muted: rgba(255, 51, 51, 0.1);
 
   /* Canvas node accent colors */
   --color-node-backstory: #A855F7;
   --color-node-content: #3B82F6;
-  --color-node-product: #22C55E;
-  --color-node-youtube: #EF4444;
-  --color-node-ai-chat: #6366F1;
+  --color-node-product: #00e87a;
+  --color-node-youtube: #ff3333;
+  --color-node-ai-chat: #ff3333;
 
   /* Borders — glass style */
-  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border: rgba(255, 255, 255, 0.07);
   --color-border-default: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.12);
-  --color-border-focus: #6366F1;
+  --color-border-focus: #ff3333;
 
   /* Fonts */
-  --font-heading: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-heading: 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-accent: 'Playfair Display', serif;
 }
 
 body {
@@ -252,26 +258,26 @@ body::before {
   z-index: 0;
 }
 
-.ambient-orb-indigo {
+.ambient-orb-red {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 51, 51, 0.12) 0%, transparent 70%);
   top: -100px;
   right: -100px;
 }
 
-.ambient-orb-purple {
+.ambient-orb-green {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 232, 122, 0.08) 0%, transparent 70%);
   bottom: -50px;
   left: -50px;
 }
 
-.ambient-orb-cyan {
+.ambient-orb-blue {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(71, 212, 255, 0.06) 0%, transparent 70%);
   top: 40%;
   left: 30%;
 }
@@ -279,13 +285,13 @@ body::before {
 /* ===== Canvas-specific styles ===== */
 
 .canvas-background {
-  background-color: #09111A;
+  background-color: #080a0c;
 }
 
 /* Animated border gradient for active/focused elements */
 @keyframes border-glow {
-  0%, 100% { border-color: rgba(99, 102, 241, 0.3); }
-  50% { border-color: rgba(99, 102, 241, 0.6); }
+  0%, 100% { border-color: rgba(255, 51, 51, 0.3); }
+  50% { border-color: rgba(255, 51, 51, 0.6); }
 }
 
 .border-glow {
@@ -352,11 +358,11 @@ body::before {
 /* ===== ReactFlow overrides ===== */
 
 .react-flow__background {
-  background-color: #09111A !important;
+  background-color: #080a0c !important;
 }
 
 .react-flow__minimap {
-  background-color: #0F1923 !important;
+  background-color: #0e1115 !important;
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
   border-radius: 8px !important;
 }
@@ -384,7 +390,7 @@ body::before {
 .react-flow__handle {
   width: 12px !important;
   height: 12px !important;
-  background: #6366F1 !important;
+  background: #ff3333 !important;
   border: 2px solid #FAFAFA !important;
   border-radius: 50% !important;
   opacity: 0.4;
@@ -397,7 +403,7 @@ body::before {
 
 .react-flow__handle:hover {
   transform: scale(1.6) !important;
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 8px rgba(255, 51, 51, 0.6) !important;
 }
 
 /* Show all handles when dragging a connection */
@@ -408,21 +414,21 @@ body::before {
 
 /* Glow on valid connection target */
 .react-flow__handle-connecting {
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.8) !important;
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.8) !important;
 }
 
 .react-flow__handle.connectingto {
   transform: scale(1.8) !important;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.8) !important;
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.8) !important;
 }
 
 .react-flow__edge-path {
-  stroke: rgba(99, 102, 241, 0.4) !important;
+  stroke: rgba(255, 51, 51, 0.4) !important;
   stroke-width: 2 !important;
 }
 
 .react-flow__node.selected {
-  outline: 2px solid #6366F1 !important;
+  outline: 2px solid #ff3333 !important;
   outline-offset: 2px !important;
   border-radius: 12px;
 }
@@ -448,7 +454,7 @@ body::before {
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: conic-gradient(from var(--glow-angle), transparent 40%, #6366F1, #06B6D4, transparent 60%);
+  background: conic-gradient(from var(--glow-angle), transparent 40%, #ff3333, #47d4ff, transparent 60%);
   animation: glow-spin 3s linear infinite;
   z-index: 0;
   opacity: 0.7;
@@ -459,7 +465,7 @@ body::before {
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: conic-gradient(from var(--glow-angle), transparent 40%, #6366F1, #06B6D4, transparent 60%);
+  background: conic-gradient(from var(--glow-angle), transparent 40%, #ff3333, #47d4ff, transparent 60%);
   animation: glow-spin 3s linear infinite;
   z-index: 0;
   filter: blur(12px);

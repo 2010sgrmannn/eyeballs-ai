@@ -31,7 +31,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
       style={{
         fontFamily: "var(--font-body)",
         fontSize: "12px",
-        color: "#6B6B6B",
+        color: "#6b7280",
         fontWeight: 500,
         letterSpacing: "0.5px",
         textTransform: "uppercase",
@@ -85,7 +85,7 @@ function NeutralChip({ children }: { children: React.ReactNode }) {
         border: "1px solid var(--color-border-default)",
         fontFamily: "var(--font-body)",
         fontSize: "13px",
-        color: "#FAFAFA",
+        color: "#f0f2f5",
       }}
     >
       {children}
@@ -103,7 +103,7 @@ function HandleBadge({ handle }: { handle: string }) {
         border: "1px solid var(--color-border-default)",
         fontFamily: "var(--font-mono)",
         fontSize: "13px",
-        color: "#FAFAFA",
+        color: "#f0f2f5",
       }}
     >
       {clean}
@@ -120,7 +120,7 @@ function TextBlock({ children }: { children: React.ReactNode }) {
         background: "var(--color-background)",
         fontFamily: "var(--font-body)",
         fontSize: "14px",
-        color: "#FAFAFA",
+        color: "#f0f2f5",
       }}
     >
       {children}
@@ -199,7 +199,7 @@ export function ProfileView({ profile, updatedAt }: ProfileViewProps) {
   const sectionLabelStyle = {
     fontFamily: "var(--font-body)",
     fontSize: "12px",
-    color: "#6B6B6B",
+    color: "#6b7280",
     fontWeight: 500 as const,
     letterSpacing: "0.5px",
     textTransform: "uppercase" as const,
@@ -321,7 +321,7 @@ export function ProfileView({ profile, updatedAt }: ProfileViewProps) {
                       background: "rgba(255, 45, 45, 0.08)",
                       fontFamily: "var(--font-body)",
                       fontSize: "13px",
-                      color: "#FF2D2D",
+                      color: "#ff3333",
                     }}
                   >
                     {CREATOR_TYPE_LABELS[profile.creator_type] ||
@@ -367,7 +367,7 @@ export function ProfileView({ profile, updatedAt }: ProfileViewProps) {
                           style={{
                             fontFamily: "var(--font-body)",
                             fontSize: "11px",
-                            color: "#6B6B6B",
+                            color: "#6b7280",
                             textTransform: "capitalize",
                           }}
                         >
@@ -499,7 +499,7 @@ export function ProfileView({ profile, updatedAt }: ProfileViewProps) {
                       background: "rgba(255, 45, 45, 0.08)",
                       fontFamily: "var(--font-body)",
                       fontSize: "13px",
-                      color: "#FF2D2D",
+                      color: "#ff3333",
                     }}
                   >
                     {profile.creator_archetype}
@@ -773,7 +773,7 @@ export function ProfileView({ profile, updatedAt }: ProfileViewProps) {
             borderTop: "1px solid var(--color-border)",
             fontFamily: "var(--font-mono)",
             fontSize: "12px",
-            color: "#6B6B6B",
+            color: "#6b7280",
           }}
         >
           Last updated{" "}

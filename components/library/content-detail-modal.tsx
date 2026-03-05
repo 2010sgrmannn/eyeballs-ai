@@ -55,10 +55,10 @@ export function ContentDetailModal({
   }
 
   function getViralityColor(score: number | null | undefined): string {
-    if (score === null || score === undefined) return "#6B6B6B";
-    if (score >= 70) return "#FF2D2D";
+    if (score === null || score === undefined) return "#6b7280";
+    if (score >= 70) return "#ff3333";
     if (score >= 40) return "#A1A1A1";
-    return "#6B6B6B";
+    return "#6b7280";
   }
 
   return (
@@ -74,12 +74,12 @@ export function ContentDetailModal({
     >
       <div
         className="w-full max-w-lg shadow-2xl shadow-black/50 animate-in fade-in duration-200"
-        style={{ border: "1px solid #1F1F1F", background: "#1A1A1A", borderRadius: "12px" }}
+        style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#141820", borderRadius: "12px" }}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between px-4 py-3"
-          style={{ borderBottom: "1px solid #1F1F1F" }}
+          style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.07)" }}
         >
           <div className="flex items-center gap-3">
             <PlatformBadge platform={platform} />
@@ -90,7 +90,7 @@ export function ContentDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 transition-colors duration-200 hover:bg-[#1F1F1F]"
+            className="rounded-md p-1 transition-colors duration-200 hover:bg-[rgba(255, 255, 255, 0.07)]"
             style={{ color: "#555" }}
             aria-label="Close"
           >
@@ -127,7 +127,7 @@ export function ContentDetailModal({
                       background: "rgba(255, 255, 255, 0.9)",
                     }}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A0A0A">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#080a0c">
                       <polygon points="8,5 20,12 8,19" />
                     </svg>
                   </div>
@@ -196,7 +196,7 @@ export function ContentDetailModal({
                       width: idx === currentSlide ? "8px" : "6px",
                       height: idx === currentSlide ? "8px" : "6px",
                       borderRadius: "50%",
-                      background: idx === currentSlide ? "#FF2D2D" : "#484848",
+                      background: idx === currentSlide ? "#ff3333" : "#484848",
                       border: "none",
                       padding: 0,
                       cursor: "pointer",
@@ -223,7 +223,7 @@ export function ContentDetailModal({
         {/* Metrics bar */}
         <div
           className="grid grid-cols-3"
-          style={{ borderBottom: "1px solid #1F1F1F", borderTop: "1px solid #1F1F1F" }}
+          style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.07)", borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
         >
           <MetricCell label="Views" value={formatNumber(content.view_count)} color="#00D4D4" />
           <MetricCell label="Likes" value={formatNumber(content.like_count)} color="#E0E0E0" border />
@@ -244,8 +244,8 @@ export function ContentDetailModal({
               <p
                 className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg p-3 leading-relaxed"
                 style={{
-                  border: "1px solid #1F1F1F",
-                  background: "#0A0A0A",
+                  border: "1px solid rgba(255, 255, 255, 0.07)",
+                  background: "#080a0c",
                   fontFamily: "var(--font-body)",
                   fontSize: "13px",
                   color: "#C0C0C0",
@@ -338,8 +338,8 @@ function MetricCell({
     <div
       className="flex flex-col items-center py-3"
       style={{
-        borderLeft: border ? "1px solid #1F1F1F" : undefined,
-        borderRight: border ? "1px solid #1F1F1F" : undefined,
+        borderLeft: border ? "1px solid rgba(255, 255, 255, 0.07)" : undefined,
+        borderRight: border ? "1px solid rgba(255, 255, 255, 0.07)" : undefined,
       }}
     >
       <span style={{ fontFamily: "var(--font-heading)", fontSize: "11px", color: "#555", letterSpacing: "0.5px", textTransform: "uppercase" }}>

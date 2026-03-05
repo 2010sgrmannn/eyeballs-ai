@@ -160,7 +160,7 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
             setModel(e.target.value);
             updateNodeData(id, { model: e.target.value });
           }}
-          className="text-xs px-2 py-1 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] focus:outline-none focus:border-[#6366F1] flex-1"
+          className="text-xs px-2 py-1 rounded-md bg-white/5 border border-white/[0.08] text-[#f0f2f5] focus:outline-none focus:border-[#ff3333] flex-1"
           style={{ fontFamily: "var(--font-body)" }}
         >
           {AI_MODELS.map((m) => (
@@ -173,7 +173,7 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
         <button
           onClick={() => removeNode(id)}
           className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-500/20"
-          style={{ color: "#EF4444" }}
+          style={{ color: "#ff3333" }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -198,9 +198,9 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
               style={{
                 background:
                   msg.role === "user"
-                    ? "rgba(99, 102, 241, 0.15)"
+                    ? "rgba(255, 51, 51, 0.15)"
                     : "rgba(255, 255, 255, 0.05)",
-                color: "#FAFAFA",
+                color: "#f0f2f5",
                 fontFamily: "var(--font-body)",
               }}
             >
@@ -224,9 +224,9 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
               style={{ background: "rgba(255, 255, 255, 0.05)" }}
             >
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#ff3333] animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#ff3333] animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#ff3333] animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
           placeholder="Describe the script you want..."
-          className="flex-1 text-xs px-3 py-2 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] placeholder-[#6B6B6B] focus:outline-none focus:border-[#6366F1]"
+          className="flex-1 text-xs px-3 py-2 rounded-md bg-white/5 border border-white/[0.08] text-[#f0f2f5] placeholder-[#6B6B6B] focus:outline-none focus:border-[#ff3333]"
           style={{ fontFamily: "var(--font-body)" }}
           disabled={isGenerating}
         />
@@ -253,7 +253,7 @@ export function AiChatNode({ id, data }: NodeProps<Node<CanvasNodeData>>) {
           disabled={isGenerating || !input.trim()}
           className="px-3 py-2 rounded-md text-xs font-medium transition-all"
           style={{
-            background: input.trim() ? "#6366F1" : "rgba(99, 102, 241, 0.2)",
+            background: input.trim() ? "#ff3333" : "rgba(255, 51, 51, 0.2)",
             color: input.trim() ? "#FFFFFF" : "#6B6B6B",
             cursor: input.trim() && !isGenerating ? "pointer" : "default",
           }}

@@ -54,11 +54,11 @@ interface Wire {
 // ---------------------------------------------------------------------------
 
 const BLOCK_COLORS = {
-  brand: "#FF2D2D",
+  brand: "#ff3333",
   content: "#7B2FBE",
   video: "#00D4D4",
   products: "#F59E0B",
-  output: "#22C55E",
+  output: "#00e87a",
 };
 
 const PLATFORM_OPTIONS: { value: Platform; label: string; icon: string }[] = [
@@ -104,15 +104,15 @@ const BlockShell = forwardRef<HTMLDivElement, BlockShellProps>(
         ref={ref}
         className={`${className} shrink-0 rounded-xl relative`}
         style={{
-          background: "#111111",
-          border: "1px solid #1F1F1F",
+          background: "#0e1115",
+          border: "1px solid rgba(255, 255, 255, 0.07)",
         }}
       >
         {/* Header */}
         <div
           className="px-4 py-3 rounded-t-xl"
           style={{
-            borderBottom: "1px solid #1F1F1F",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.07)",
             background: `rgba(${hexToRgb(accent)}, 0.05)`,
           }}
         >
@@ -138,7 +138,7 @@ const BlockShell = forwardRef<HTMLDivElement, BlockShellProps>(
         {hasInput && (
           <div
             className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2"
-            style={{ borderColor: accent, background: "#0A0A0A" }}
+            style={{ borderColor: accent, background: "#080a0c" }}
           />
         )}
 
@@ -146,7 +146,7 @@ const BlockShell = forwardRef<HTMLDivElement, BlockShellProps>(
         {hasOutput && (
           <div
             className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2"
-            style={{ borderColor: accent, background: "#0A0A0A" }}
+            style={{ borderColor: accent, background: "#080a0c" }}
           />
         )}
       </div>
@@ -165,7 +165,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
         style={{
           fontFamily: "var(--font-body)",
           fontSize: "13px",
-          color: "#6B6B6B",
+          color: "#6b7280",
         }}
       >
         No brand profile found. Set up your brand voice in Context.
@@ -181,7 +181,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
-              color: "#6B6B6B",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "2px",
@@ -193,7 +193,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "13px",
-              color: "#FAFAFA",
+              color: "#f0f2f5",
             }}
           >
             {profile.display_name}
@@ -207,7 +207,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
-              color: "#6B6B6B",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "2px",
@@ -219,7 +219,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "13px",
-              color: "#FAFAFA",
+              color: "#f0f2f5",
             }}
           >
             {profile.creator_archetype}
@@ -233,7 +233,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
-              color: "#6B6B6B",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "2px",
@@ -245,7 +245,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "13px",
-              color: "#FAFAFA",
+              color: "#f0f2f5",
             }}
           >
             {profile.niche}
@@ -259,7 +259,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
-              color: "#6B6B6B",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "4px",
@@ -274,7 +274,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
                 className="px-2 py-0.5 rounded"
                 style={{
                   background: "#161616",
-                  border: "1px solid #1F1F1F",
+                  border: "1px solid rgba(255, 255, 255, 0.07)",
                   fontFamily: "var(--font-mono)",
                   fontSize: "10px",
                   color: "#A1A1A1",
@@ -293,7 +293,7 @@ function BrandVoiceContent({ profile }: { profile: BrandProfile | null }) {
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "11px",
-              color: "#6B6B6B",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "2px",
@@ -338,7 +338,7 @@ function ContentRefContent({
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "#6B6B6B",
+            color: "#6b7280",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
             marginBottom: "4px",
@@ -351,9 +351,9 @@ function ContentRefContent({
           onChange={(e) => onFolderChange(e.target.value)}
           className="w-full px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1"
           style={{
-            border: "1px solid #1F1F1F",
-            background: "#0A0A0A",
-            color: "#FAFAFA",
+            border: "1px solid rgba(255, 255, 255, 0.07)",
+            background: "#080a0c",
+            color: "#f0f2f5",
             fontFamily: "var(--font-body)",
             fontSize: "12px",
             outline: "none",
@@ -409,7 +409,7 @@ function VideoConfigContent({
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "#6B6B6B",
+            color: "#6b7280",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
             marginBottom: "4px",
@@ -424,9 +424,9 @@ function VideoConfigContent({
           rows={3}
           className="w-full px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 resize-none"
           style={{
-            border: "1px solid #1F1F1F",
-            background: "#0A0A0A",
-            color: "#FAFAFA",
+            border: "1px solid rgba(255, 255, 255, 0.07)",
+            background: "#080a0c",
+            color: "#f0f2f5",
             fontFamily: "var(--font-body)",
             fontSize: "12px",
           }}
@@ -438,7 +438,7 @@ function VideoConfigContent({
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "#6B6B6B",
+            color: "#6b7280",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
             marginBottom: "4px",
@@ -453,13 +453,13 @@ function VideoConfigContent({
               onClick={() => onPlatformChange(p.value)}
               className="flex-1 px-2 py-1.5 rounded-lg transition-all text-center"
               style={{
-                border: `1px solid ${platform === p.value ? BLOCK_COLORS.video : "#1F1F1F"}`,
+                border: `1px solid ${platform === p.value ? BLOCK_COLORS.video : "rgba(255, 255, 255, 0.07)"}`,
                 background:
                   platform === p.value
                     ? `rgba(${hexToRgb(BLOCK_COLORS.video)}, 0.1)`
-                    : "#0A0A0A",
+                    : "#080a0c",
                 color:
-                  platform === p.value ? BLOCK_COLORS.video : "#6B6B6B",
+                  platform === p.value ? BLOCK_COLORS.video : "#6b7280",
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 fontWeight: 600,
@@ -476,7 +476,7 @@ function VideoConfigContent({
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "#6B6B6B",
+            color: "#6b7280",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
             marginBottom: "4px",
@@ -491,13 +491,13 @@ function VideoConfigContent({
               onClick={() => onStyleChange(s.value)}
               className="flex-1 px-2 py-1 rounded-lg transition-all text-center"
               style={{
-                border: `1px solid ${scriptStyle === s.value ? BLOCK_COLORS.video : "#1F1F1F"}`,
+                border: `1px solid ${scriptStyle === s.value ? BLOCK_COLORS.video : "rgba(255, 255, 255, 0.07)"}`,
                 background:
                   scriptStyle === s.value
                     ? `rgba(${hexToRgb(BLOCK_COLORS.video)}, 0.1)`
-                    : "#0A0A0A",
+                    : "#080a0c",
                 color:
-                  scriptStyle === s.value ? BLOCK_COLORS.video : "#6B6B6B",
+                  scriptStyle === s.value ? BLOCK_COLORS.video : "#6b7280",
                 fontFamily: "var(--font-body)",
                 fontSize: "11px",
                 fontWeight: 500,
@@ -530,13 +530,13 @@ function ProductsContent({
   onProductToggle: (id: string) => void;
 }) {
   const TYPE_BADGE_COLORS: Record<string, string> = {
-    product: "#FF2D2D",
+    product: "#ff3333",
     guide: "#7B2FBE",
-    freebie: "#22C55E",
+    freebie: "#00e87a",
     course: "#00D4D4",
     coaching: "#F59E0B",
     service: "#3B82F6",
-    other: "#6B6B6B",
+    other: "#6b7280",
   };
 
   return (
@@ -547,7 +547,7 @@ function ProductsContent({
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "#6B6B6B",
+            color: "#6b7280",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
           }}
@@ -560,14 +560,14 @@ function ProductsContent({
           style={{
             background: includeProducts
               ? BLOCK_COLORS.products
-              : "#1F1F1F",
+              : "rgba(255, 255, 255, 0.07)",
           }}
         >
           <span
             className="absolute top-0.5 w-4 h-4 rounded-full transition-all"
             style={{
               left: includeProducts ? "18px" : "2px",
-              background: "#FAFAFA",
+              background: "#f0f2f5",
             }}
           />
         </button>
@@ -580,7 +580,7 @@ function ProductsContent({
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "12px",
-                color: "#6B6B6B",
+                color: "#6b7280",
               }}
             >
               No offerings yet — add them in Context
@@ -595,17 +595,17 @@ function ProductsContent({
                     onClick={() => onProductToggle(p.id)}
                     className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-all"
                     style={{
-                      border: `1px solid ${selected ? BLOCK_COLORS.products : "#1F1F1F"}`,
+                      border: `1px solid ${selected ? BLOCK_COLORS.products : "rgba(255, 255, 255, 0.07)"}`,
                       background: selected
                         ? `rgba(${hexToRgb(BLOCK_COLORS.products)}, 0.08)`
-                        : "#0A0A0A",
+                        : "#080a0c",
                     }}
                   >
                     <span
                       style={{
                         fontFamily: "var(--font-body)",
                         fontSize: "12px",
-                        color: selected ? "#FAFAFA" : "#A1A1A1",
+                        color: selected ? "#f0f2f5" : "#A1A1A1",
                         flex: 1,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -617,10 +617,10 @@ function ProductsContent({
                     <span
                       className="px-1.5 py-0.5 rounded shrink-0"
                       style={{
-                        background: `rgba(${hexToRgb(TYPE_BADGE_COLORS[p.type] || "#6B6B6B")}, 0.15)`,
+                        background: `rgba(${hexToRgb(TYPE_BADGE_COLORS[p.type] || "#6b7280")}, 0.15)`,
                         fontFamily: "var(--font-mono)",
                         fontSize: "9px",
-                        color: TYPE_BADGE_COLORS[p.type] || "#6B6B6B",
+                        color: TYPE_BADGE_COLORS[p.type] || "#6b7280",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
                       }}
@@ -680,7 +680,7 @@ function OutputContent({
           background: generating
             ? "transparent"
             : BLOCK_COLORS.output,
-          color: generating ? BLOCK_COLORS.output : "#0A0A0A",
+          color: generating ? BLOCK_COLORS.output : "#080a0c",
           fontFamily: "var(--font-body)",
           fontSize: "14px",
           fontWeight: 600,
@@ -720,7 +720,7 @@ function OutputContent({
           style={{
             border: "1px solid rgba(239, 68, 68, 0.3)",
             background: "rgba(239, 68, 68, 0.08)",
-            color: "#EF4444",
+            color: "#ff3333",
             fontFamily: "var(--font-body)",
             fontSize: "12px",
           }}
@@ -739,8 +739,8 @@ function OutputContent({
                 key={i}
                 className="rounded-lg overflow-hidden"
                 style={{
-                  border: "1px solid #1F1F1F",
-                  background: "#0A0A0A",
+                  border: "1px solid rgba(255, 255, 255, 0.07)",
+                  background: "#080a0c",
                 }}
               >
                 {/* Card header */}
@@ -767,7 +767,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "11px",
-                          color: "#6B6B6B",
+                          color: "#6b7280",
                         }}
                       >
                         {s.hook}
@@ -776,7 +776,7 @@ function OutputContent({
                   </div>
                   <span
                     style={{
-                      color: "#6B6B6B",
+                      color: "#6b7280",
                       fontSize: "10px",
                       marginLeft: "8px",
                       flexShrink: 0,
@@ -790,7 +790,7 @@ function OutputContent({
                 {isExpanded && (
                   <div
                     className="px-3 pb-3 space-y-2"
-                    style={{ borderTop: "1px solid #1F1F1F" }}
+                    style={{ borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
                   >
                     {s.pierced_topic && (
                       <div className="pt-2">
@@ -825,7 +825,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "10px",
-                          color: "#FF2D2D",
+                          color: "#ff3333",
                           textTransform: "uppercase",
                           letterSpacing: "0.5px",
                           marginBottom: "2px",
@@ -839,7 +839,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "12px",
-                          color: "#FAFAFA",
+                          color: "#f0f2f5",
                           lineHeight: 1.5,
                         }}
                       >
@@ -866,7 +866,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "12px",
-                          color: "#FAFAFA",
+                          color: "#f0f2f5",
                           lineHeight: 1.5,
                         }}
                       >
@@ -879,7 +879,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "10px",
-                          color: "#FF2D2D",
+                          color: "#ff3333",
                           textTransform: "uppercase",
                           letterSpacing: "0.5px",
                           marginBottom: "2px",
@@ -893,7 +893,7 @@ function OutputContent({
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "12px",
-                          color: "#FAFAFA",
+                          color: "#f0f2f5",
                           lineHeight: 1.5,
                         }}
                       >
@@ -904,7 +904,7 @@ function OutputContent({
                     {/* Actions */}
                     <div
                       className="flex gap-2 pt-2"
-                      style={{ borderTop: "1px solid #1F1F1F" }}
+                      style={{ borderTop: "1px solid rgba(255, 255, 255, 0.07)" }}
                     >
                       <button
                         onClick={(e) => {
@@ -1240,9 +1240,9 @@ export function ScriptCanvas() {
       className="relative overflow-x-auto rounded-xl"
       style={{
         background:
-          "radial-gradient(circle, #1A1A1A 1px, transparent 1px)",
+          "radial-gradient(circle, #141820 1px, transparent 1px)",
         backgroundSize: "20px 20px",
-        backgroundColor: "#0A0A0A",
+        backgroundColor: "#080a0c",
         minHeight: "400px",
       }}
     >

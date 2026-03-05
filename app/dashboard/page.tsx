@@ -25,12 +25,12 @@ export default function DashboardPage() {
         >
           <div
             className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg text-lg"
-            style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "#FF2D2D", background: "rgba(255, 45, 45, 0.1)" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "#ff3333", background: "rgba(255, 45, 45, 0.1)" }}
           >
             1
           </div>
           <h2
-            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#FAFAFA" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#f0f2f5" }}
           >
             Scrape creators
           </h2>
@@ -42,7 +42,7 @@ export default function DashboardPage() {
           </p>
           <span
             className="mt-4 inline-block"
-            style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#FF2D2D" }}
+            style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#ff3333" }}
           >
             Start scraping &rarr;
           </span>
@@ -60,7 +60,7 @@ export default function DashboardPage() {
             2
           </div>
           <h2
-            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#FAFAFA" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#f0f2f5" }}
           >
             Browse your library
           </h2>
@@ -85,12 +85,12 @@ export default function DashboardPage() {
         >
           <div
             className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg text-lg"
-            style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "#FF2D2D", background: "rgba(255, 45, 45, 0.1)" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 700, color: "#ff3333", background: "rgba(255, 45, 45, 0.1)" }}
           >
             3
           </div>
           <h2
-            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#FAFAFA" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: "16px", color: "#f0f2f5" }}
           >
             Generate scripts
           </h2>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
           </p>
           <span
             className="mt-4 inline-block"
-            style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#FF2D2D" }}
+            style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "#ff3333" }}
           >
             Create script &rarr;
           </span>
@@ -113,14 +113,14 @@ export default function DashboardPage() {
       <div className="mt-10 grid gap-4 sm:grid-cols-3 animate-stagger-fade-up">
         {[
           { label: "Creators tracked", value: "0", color: "#00D4D4" },
-          { label: "Content analyzed", value: "0", color: "#FF2D2D" },
-          { label: "Scripts generated", value: "0", color: "#FF2D2D" },
+          { label: "Content analyzed", value: "0", color: "#ff3333" },
+          { label: "Scripts generated", value: "0", color: "#ff3333" },
         ].map((stat) => (
           <div
             key={stat.label}
             className="p-5 rounded-xl glass-card"
           >
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B", fontWeight: 500, letterSpacing: "0.5px", textTransform: "uppercase" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280", fontWeight: 500, letterSpacing: "0.5px", textTransform: "uppercase" }}>
               {stat.label}
             </p>
             <p
@@ -136,7 +136,7 @@ export default function DashboardPage() {
       {/* Tip */}
       <div className="mt-8 p-5 rounded-xl glass-card">
         <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1", lineHeight: 1.6 }}>
-          <span style={{ color: "#FF2D2D", fontFamily: "var(--font-heading)", fontSize: "12px", fontWeight: 600 }}>Pro tip:</span>{" "}
+          <span style={{ color: "#ff3333", fontFamily: "var(--font-heading)", fontSize: "12px", fontWeight: 600 }}>Pro tip:</span>{" "}
           Start by scraping 2-3 creators in your niche. The AI works best when it has at least 20 pieces of content to analyze patterns from.
         </p>
       </div>

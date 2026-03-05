@@ -27,8 +27,8 @@ export function Pagination({
         disabled={currentPage <= 1}
         className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:bg-[#161616] disabled:cursor-not-allowed disabled:opacity-30"
         style={{
-          border: "1px solid #1F1F1F",
-          background: "#1A1A1A",
+          border: "1px solid rgba(255, 255, 255, 0.07)",
+          background: "#141820",
           color: "#888",
           fontFamily: "var(--font-body)",
           fontSize: "12px",
@@ -54,8 +54,8 @@ export function Pagination({
             onClick={() => onPageChange(p)}
             className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200"
             style={{
-              border: p === currentPage ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
-              background: p === currentPage ? "#FF2D2D" : "#111",
+              border: p === currentPage ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
+              background: p === currentPage ? "#ff3333" : "#0e1115",
               color: p === currentPage ? "#FFFFFF" : "#888",
               fontFamily: "var(--font-mono)",
               fontWeight: p === currentPage ? 600 : 400,
@@ -72,8 +72,8 @@ export function Pagination({
         disabled={currentPage >= totalPages}
         className="rounded-lg px-3 py-1.5 text-sm transition-all duration-200 hover:bg-[#161616] disabled:cursor-not-allowed disabled:opacity-30"
         style={{
-          border: "1px solid #1F1F1F",
-          background: "#1A1A1A",
+          border: "1px solid rgba(255, 255, 255, 0.07)",
+          background: "#141820",
           color: "#888",
           fontFamily: "var(--font-body)",
           fontSize: "12px",

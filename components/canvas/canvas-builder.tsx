@@ -290,7 +290,7 @@ export function CanvasBuilder({
               fontFamily: "var(--font-body)",
             }}
           >
-            <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#ff3333] animate-pulse" />
             Saving...
           </div>
         )}
@@ -299,10 +299,10 @@ export function CanvasBuilder({
         {!activeCanvasId && canvases.length === 0 && !showWizard && (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
-              <p className="mb-4 text-sm text-[#6B6B6B]">No canvases yet</p>
+              <p className="mb-4 text-sm text-[#6b7280]">No canvases yet</p>
               <button
                 onClick={handleNewCanvas}
-                className="rounded-xl bg-[#6366F1] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                className="rounded-xl bg-[#ff3333] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
               >
                 Create your first canvas
               </button>
@@ -356,7 +356,7 @@ export function CanvasBuilder({
               style={{
                 backgroundColor: colors.surface,
               }}
-              maskColor="rgba(9, 17, 26, 0.7)"
+              maskColor="rgba(8, 10, 12, 0.7)"
             />
           </ReactFlow>
         )}

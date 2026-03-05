@@ -29,15 +29,15 @@ export function BulkActionBar({
     <div
       className="fixed bottom-0 left-0 right-0 z-50 flex items-center gap-3 px-6 py-3"
       style={{
-        background: "#1A1A1A",
-        borderTop: "1px solid #1F1F1F",
+        background: "#141820",
+        borderTop: "1px solid rgba(255, 255, 255, 0.07)",
       }}
     >
       <span
         style={{
           fontFamily: "var(--font-mono)",
           fontSize: "13px",
-          color: "#FF2D2D",
+          color: "#ff3333",
         }}
       >
         {selectedCount}
@@ -58,7 +58,7 @@ export function BulkActionBar({
           onClick={onFavorite}
           style={{
             ...buttonStyle,
-            border: "1px solid #1F1F1F",
+            border: "1px solid rgba(255, 255, 255, 0.07)",
             background: "#161616",
             color: "#E0E0E0",
           }}
@@ -70,7 +70,7 @@ export function BulkActionBar({
           onClick={onMoveToFolder}
           style={{
             ...buttonStyle,
-            border: "1px solid #1F1F1F",
+            border: "1px solid rgba(255, 255, 255, 0.07)",
             background: "#161616",
             color: "#E0E0E0",
           }}
@@ -82,9 +82,9 @@ export function BulkActionBar({
           onClick={onDelete}
           style={{
             ...buttonStyle,
-            border: "1px solid #FF2D2D",
+            border: "1px solid #ff3333",
             background: "rgba(255, 45, 45, 0.15)",
-            color: "#FF2D2D",
+            color: "#ff3333",
           }}
         >
           Delete
@@ -94,7 +94,7 @@ export function BulkActionBar({
           onClick={onCancel}
           style={{
             ...buttonStyle,
-            border: "1px solid #1F1F1F",
+            border: "1px solid rgba(255, 255, 255, 0.07)",
             background: "transparent",
             color: "#888",
           }}

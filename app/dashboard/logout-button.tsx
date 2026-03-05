@@ -30,8 +30,8 @@ export function LogoutButton() {
         transition: "all 0.2s ease",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "#FF2D2D";
-        e.currentTarget.style.color = "#FAFAFA";
+        e.currentTarget.style.borderColor = "#ff3333";
+        e.currentTarget.style.color = "#f0f2f5";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "#333333";

@@ -74,9 +74,9 @@ function createEmptyStory(): StoryDraft {
 // ---------------------------------------------------------------------------
 
 const inputStyle: React.CSSProperties = {
-  border: "1px solid #1F1F1F",
-  background: "#0A0A0A",
-  color: "#FAFAFA",
+  border: "1px solid rgba(255, 255, 255, 0.07)",
+  background: "#080a0c",
+  color: "#f0f2f5",
   fontFamily: "var(--font-body)",
   fontSize: "14px",
 };
@@ -100,7 +100,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-body)",
   fontSize: "13px",
   fontWeight: 600,
-  color: "#6B6B6B",
+  color: "#6b7280",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
@@ -109,7 +109,7 @@ const sectionTitleStyle: React.CSSProperties = {
   fontFamily: "var(--font-heading)",
   fontSize: "16px",
   fontWeight: 600,
-  color: "#FAFAFA",
+  color: "#f0f2f5",
 };
 
 // ---------------------------------------------------------------------------
@@ -127,14 +127,14 @@ function Chip({
   onClick: () => void;
   color?: "red" | "teal";
 }) {
-  const accent = color === "teal" ? "#00D4D4" : "#FF2D2D";
+  const accent = color === "teal" ? "#00D4D4" : "#ff3333";
   return (
     <button
       type="button"
       onClick={onClick}
       className="rounded-lg px-4 py-2 transition-all duration-200 hover:scale-[1.02]"
       style={{
-        border: selected ? `1px solid ${accent}` : "1px solid #1F1F1F",
+        border: selected ? `1px solid ${accent}` : "1px solid rgba(255, 255, 255, 0.07)",
         background: selected
           ? color === "teal"
             ? "rgba(0, 212, 212, 0.15)"
@@ -207,13 +207,13 @@ function ChipWithCustom({
             }
           }}
           placeholder="Add custom..."
-          className="flex-1 rounded-md px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+          className="flex-1 rounded-md px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
           style={inputStyle}
         />
         <button
           type="button"
           onClick={addCustom}
-          className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#FF2D2D] hover:scale-[1.02]"
+          className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#ff3333] hover:scale-[1.02]"
           style={{
             border: "1px solid #333",
             color: "#A1A1A1",
@@ -261,7 +261,7 @@ function ToneSlider({
             transform: "translateY(-50%)",
             height: 4,
             borderRadius: 2,
-            background: "#1F1F1F",
+            background: "rgba(255, 255, 255, 0.07)",
           }}
         />
         {/* Dots */}
@@ -275,8 +275,8 @@ function ToneSlider({
               width: value === pos ? 20 : 12,
               height: value === pos ? 20 : 12,
               borderRadius: "50%",
-              background: value === pos ? "#FF2D2D" : "#333",
-              border: value === pos ? "2px solid #FF2D2D" : "2px solid #333",
+              background: value === pos ? "#ff3333" : "#333",
+              border: value === pos ? "2px solid #ff3333" : "2px solid #333",
               cursor: "pointer",
               boxShadow: value === pos ? "0 0 8px rgba(255, 45, 45, 0.4)" : "none",
             }}
@@ -305,8 +305,8 @@ function SelectableCard({
       onClick={onClick}
       className="rounded-xl p-4 text-left transition-all duration-200 hover:scale-[1.02]"
       style={{
-        border: selected ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
-        background: selected ? "rgba(255, 45, 45, 0.08)" : "#111111",
+        border: selected ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
+        background: selected ? "rgba(255, 45, 45, 0.08)" : "#0e1115",
         cursor: "pointer",
         width: "100%",
         ...extraStyle,
@@ -956,7 +956,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             value={formData.display_name}
             onChange={(e) => update("display_name", e.target.value)}
             placeholder="Your name or brand name"
-            className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+            className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
             style={inputStyle}
           />
         </div>
@@ -972,7 +972,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                 onClick={() => update("creator_type", ct.id)}
               >
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <div style={{ color: formData.creator_type === ct.id ? "#FF2D2D" : "#555" }}>
+                  <div style={{ color: formData.creator_type === ct.id ? "#ff3333" : "#555" }}>
                     {ct.icon}
                   </div>
                   <span
@@ -980,7 +980,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                       fontFamily: "var(--font-heading)",
                       fontSize: "15px",
                       fontWeight: 600,
-                      color: formData.creator_type === ct.id ? "#FFFFFF" : "#FAFAFA",
+                      color: formData.creator_type === ct.id ? "#FFFFFF" : "#f0f2f5",
                     }}
                   >
                     {ct.label}
@@ -1011,7 +1011,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                 onClick={() => update("primary_platform", p.id)}
               >
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <div style={{ color: formData.primary_platform === p.id ? "#FF2D2D" : "#555" }}>
+                  <div style={{ color: formData.primary_platform === p.id ? "#ff3333" : "#555" }}>
                     {p.icon}
                   </div>
                   <span
@@ -1052,7 +1052,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("personal_bio", e.target.value)}
               rows={3}
               placeholder="In 2-4 sentences, who are you really? What drives you?"
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1064,7 +1064,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("early_life", e.target.value)}
               rows={2}
               placeholder="Where did you grow up? What shaped you early on?"
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1076,7 +1076,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("biggest_struggle", e.target.value)}
               rows={2}
               placeholder="The hard thing you overcame..."
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1088,7 +1088,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("defining_moment", e.target.value)}
               rows={2}
               placeholder="The pivot that changed everything..."
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1108,10 +1108,10 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               <div
                 key={idx}
                 className="space-y-3 rounded-xl p-5"
-                style={{ background: "#111111", border: "1px solid #1F1F1F" }}
+                style={{ background: "#0e1115", border: "1px solid rgba(255, 255, 255, 0.07)" }}
               >
                 <div className="flex items-center justify-between">
-                  <span style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#FAFAFA" }}>
+                  <span style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#f0f2f5" }}>
                     Moment {idx + 1}
                   </span>
                   {stories.length > 3 && (
@@ -1119,7 +1119,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                       type="button"
                       onClick={() => setStories((prev) => prev.filter((_, i) => i !== idx))}
                       className="rounded-lg p-1 transition-all hover:scale-[1.02]"
-                      style={{ border: "1px solid #1F1F1F", background: "#0A0A0A", color: "#555", cursor: "pointer" }}
+                      style={{ border: "1px solid rgba(255, 255, 255, 0.07)", background: "#080a0c", color: "#555", cursor: "pointer" }}
                       aria-label="Remove moment"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1135,7 +1135,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                   value={story.title}
                   onChange={(e) => updateStory(idx, "title", e.target.value)}
                   placeholder="Give this moment a title"
-                  className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+                  className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
                   style={inputStyle}
                 />
 
@@ -1144,7 +1144,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                   onChange={(e) => updateStory(idx, "content", e.target.value)}
                   rows={4}
                   placeholder="Tell the story. Be specific: what happened, how it felt, what changed after..."
-                  className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+                  className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
                   style={inputStyle}
                 />
 
@@ -1184,7 +1184,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                       value={story.time_period}
                       onChange={(e) => updateStory(idx, "time_period", e.target.value)}
                       placeholder="e.g. 2019"
-                      className="w-full rounded-lg px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+                      className="w-full rounded-lg px-3 py-2 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
                       style={inputStyle}
                     />
                   </div>
@@ -1197,7 +1197,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             <button
               type="button"
               onClick={() => setStories((prev) => [...prev, createEmptyStory()])}
-              className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#FF2D2D] hover:scale-[1.02]"
+              className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#ff3333] hover:scale-[1.02]"
               style={{
                 border: "1px solid #333",
                 color: "#A1A1A1",
@@ -1233,7 +1233,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             <div className="flex items-center gap-2">
               <div
                 className="flex items-center rounded-l-lg px-3 py-3"
-                style={{ background: "#111111", border: "1px solid #1F1F1F", borderRight: "none", color: "#555" }}
+                style={{ background: "#0e1115", border: "1px solid rgba(255, 255, 255, 0.07)", borderRight: "none", color: "#555" }}
               >
                 <InstagramIcon />
               </div>
@@ -1244,7 +1244,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                   update("social_handles", { ...formData.social_handles, instagram: e.target.value })
                 }
                 placeholder="@username"
-                className="flex-1 rounded-r-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+                className="flex-1 rounded-r-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
                 style={inputStyle}
               />
             </div>
@@ -1252,14 +1252,14 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
           <div
             className="rounded-xl p-4"
-            style={{ background: "#111111", border: "1px solid #1F1F1F" }}
+            style={{ background: "#0e1115", border: "1px solid rgba(255, 255, 255, 0.07)" }}
           >
             <div className="flex items-start gap-3">
               <div style={{ color: "#00D4D4", marginTop: 2 }}>
                 <SparkleIcon />
               </div>
               <div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#FAFAFA", marginBottom: 4 }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#f0f2f5", marginBottom: 4 }}>
                   What happens next
                 </p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#888888", lineHeight: 1.5 }}>
@@ -1342,7 +1342,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
         {/* Voice & Tone Section */}
         <div className="space-y-6">
-          <h3 style={{ ...sectionTitleStyle, fontSize: "18px", color: "#FF2D2D" }}>Voice &amp; Tone</h3>
+          <h3 style={{ ...sectionTitleStyle, fontSize: "18px", color: "#ff3333" }}>Voice &amp; Tone</h3>
 
           {/* Niche */}
           <div className="space-y-3">
@@ -1416,7 +1416,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                         fontFamily: "var(--font-heading)",
                         fontSize: "15px",
                         fontWeight: 600,
-                        color: formData.creator_archetype === arch.id ? "#FF2D2D" : "#FAFAFA",
+                        color: formData.creator_archetype === arch.id ? "#ff3333" : "#f0f2f5",
                       }}
                     >
                       {arch.label}
@@ -1463,7 +1463,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                   onClick={() => update("content_goal", g.id)}
                 >
                   <div className="flex items-center gap-3">
-                    <div style={{ color: formData.content_goal === g.id ? "#FF2D2D" : "#555" }}>
+                    <div style={{ color: formData.content_goal === g.id ? "#ff3333" : "#555" }}>
                       {g.icon}
                     </div>
                     <span
@@ -1517,7 +1517,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
         {/* Audience Section */}
         <div className="space-y-6">
-          <h3 style={{ ...sectionTitleStyle, fontSize: "18px", color: "#FF2D2D" }}>Audience</h3>
+          <h3 style={{ ...sectionTitleStyle, fontSize: "18px", color: "#ff3333" }}>Audience</h3>
 
           {/* Target audience */}
           <div className="space-y-2">
@@ -1527,7 +1527,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("target_audience", e.target.value)}
               rows={2}
               placeholder="e.g., Young entrepreneurs who want to grow their personal brand on social media"
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1540,7 +1540,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("audience_problem", e.target.value)}
               rows={2}
               placeholder="e.g., They struggle to grow on social media and want actionable advice..."
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1601,7 +1601,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               onChange={(e) => update("unique_value_prop", e.target.value)}
               rows={3}
               placeholder="e.g., I break down complex marketing strategies into 60-second videos..."
-              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#FF2D2D]"
+              className="w-full rounded-lg px-4 py-3 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500/20 focus:border-[#ff3333]"
               style={inputStyle}
             />
           </div>
@@ -1638,7 +1638,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
         {/* Summary card */}
         <div
           className="space-y-5 rounded-xl p-6"
-          style={{ background: "#111111", border: "1px solid #1F1F1F" }}
+          style={{ background: "#0e1115", border: "1px solid rgba(255, 255, 255, 0.07)" }}
         >
           <h3 style={{ ...sectionTitleStyle, fontSize: "18px" }}>Your Brand DNA</h3>
 
@@ -1646,20 +1646,20 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             {/* Name, archetype, niche */}
             <div className="flex flex-wrap gap-x-8 gap-y-2">
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Name</span>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#FAFAFA" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Name</span>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#f0f2f5" }}>
                   {formData.display_name}
                 </p>
               </div>
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Archetype</span>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#FAFAFA" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Archetype</span>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#f0f2f5" }}>
                   {archLabel}
                 </p>
               </div>
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Niche</span>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#FAFAFA" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Niche</span>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#f0f2f5" }}>
                   {formData.niche}
                 </p>
               </div>
@@ -1667,7 +1667,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
             {/* Tone */}
             <div>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Voice</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Voice</span>
               <div className="mt-1 flex flex-wrap gap-2">
                 {formData.tone_descriptors.map((td) => (
                   <span
@@ -1689,7 +1689,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
             {/* Style */}
             <div>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Style</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Style</span>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1" }}>
                 {toneWords.join(" \u2022 ")}
               </p>
@@ -1697,8 +1697,8 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
 
             {/* Content goal */}
             <div>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Content goal</span>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#FAFAFA" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Content goal</span>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#f0f2f5" }}>
                 {goalLabel}
               </p>
             </div>
@@ -1706,7 +1706,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             {/* Content pillars */}
             {formData.content_pillars.length > 0 && (
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Content pillars</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Content pillars</span>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {formData.content_pillars.map((p) => (
                     <span
@@ -1714,8 +1714,8 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                       className="rounded-full px-3 py-1"
                       style={{
                         background: "rgba(255, 45, 45, 0.15)",
-                        border: "1px solid #FF2D2D",
-                        color: "#FF2D2D",
+                        border: "1px solid #ff3333",
+                        color: "#ff3333",
                         fontFamily: "var(--font-body)",
                         fontSize: "13px",
                       }}
@@ -1730,7 +1730,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             {/* Audience */}
             {formData.target_audience && (
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Target audience</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Target audience</span>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1" }}>
                   {formData.target_audience}
                 </p>
@@ -1740,7 +1740,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             {/* Values */}
             {formData.values.length > 0 && (
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>Values</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>Values</span>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1" }}>
                   {formData.values.join(", ")}
                 </p>
@@ -1750,7 +1750,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             {/* UVP */}
             {formData.unique_value_prop && (
               <div>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6B6B6B" }}>What makes you different</span>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#6b7280" }}>What makes you different</span>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", color: "#A1A1A1" }}>
                   {formData.unique_value_prop}
                 </p>
@@ -1763,7 +1763,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
         {filledStories.length > 0 && (
           <div
             className="space-y-4 rounded-xl p-6"
-            style={{ background: "#111111", border: "1px solid #1F1F1F" }}
+            style={{ background: "#0e1115", border: "1px solid rgba(255, 255, 255, 0.07)" }}
           >
             <h3 style={{ ...sectionTitleStyle, fontSize: "18px" }}>Your Key Moments ({filledStories.length})</h3>
             <div className="space-y-3">
@@ -1785,7 +1785,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                     {i + 1}
                   </div>
                   <div>
-                    <p style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#FAFAFA" }}>
+                    <p style={{ fontFamily: "var(--font-heading)", fontSize: "14px", fontWeight: 600, color: "#f0f2f5" }}>
                       {story.title}
                     </p>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#888888", marginTop: 2 }}>
@@ -1806,7 +1806,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
             disabled={saving}
             className="rounded-lg px-8 py-3 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/10 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
             style={{
-              background: "linear-gradient(135deg, #FF2D2D, #FF4444)",
+              background: "linear-gradient(135deg, #ff3333, #FF4444)",
               color: "#fff",
               fontFamily: "var(--font-heading)",
               fontSize: "16px",
@@ -1842,9 +1842,9 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
         <div
           className="fixed top-4 right-4 z-50 rounded-xl px-5 py-3 shadow-lg"
           style={{
-            background: "#1A1A1A",
+            background: "#141820",
             border: "1px solid #2A2A2A",
-            color: "#FAFAFA",
+            color: "#f0f2f5",
             fontFamily: "var(--font-body)",
             fontSize: "13px",
             maxWidth: 360,
@@ -1859,7 +1859,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               <span style={{ color: "#00D4D4" }}>&#10003;</span>
             )}
             {analyzingPhase === "error" && (
-              <span style={{ color: "#FF2D2D" }}>!</span>
+              <span style={{ color: "#ff3333" }}>!</span>
             )}
             <span>{toastMessage}</span>
           </div>
@@ -1887,7 +1887,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "12px",
-                color: "#6B6B6B",
+                color: "#6b7280",
                 fontWeight: 500,
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
@@ -1899,7 +1899,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "12px",
-                color: "#FF2D2D",
+                color: "#ff3333",
                 fontWeight: 500,
               }}
             >
@@ -1913,7 +1913,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                 width: `${
                   ((stepIndex + 1) / totalSteps) * 100
                 }%`,
-                background: "linear-gradient(90deg, #FF2D2D, #00D4D4)",
+                background: "linear-gradient(90deg, #ff3333, #00D4D4)",
               }}
               role="progressbar"
               aria-valuenow={stepIndex + 1}
@@ -1961,7 +1961,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
               type="button"
               onClick={handleBack}
               disabled={stepIndex === 0}
-              className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#FF2D2D] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg px-4 py-2 transition-all duration-200 hover:border-[#ff3333] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
               style={{
                 border: "1px solid #333",
                 color: "#A1A1A1",
@@ -1980,7 +1980,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                 disabled={saving}
                 className="rounded-lg px-6 py-2 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/10 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
-                  background: "#FF2D2D",
+                  background: "#ff3333",
                   color: "#fff",
                   fontFamily: "var(--font-body)",
                   fontSize: "14px",
@@ -1996,7 +1996,7 @@ export function BrandProfileForm({ initialData, mode, onAnalysisStart, startAtSt
                 disabled={saving || isAnalysisStarting}
                 className="rounded-lg px-6 py-2 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/10 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
-                  background: "#FF2D2D",
+                  background: "#ff3333",
                   color: "#fff",
                   fontFamily: "var(--font-body)",
                   fontSize: "14px",

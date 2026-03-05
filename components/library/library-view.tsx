@@ -414,7 +414,7 @@ export function LibraryView({
               "Loading..."
             ) : (
               <>
-                <span style={{ fontFamily: "var(--font-mono)", color: "#FF2D2D" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "#ff3333" }}>
                   {result.totalCount}
                 </span>{" "}
                 item{result.totalCount !== 1 ? "s" : ""}
@@ -428,8 +428,8 @@ export function LibraryView({
         <div
           className="sticky top-0 z-30 mb-4 flex items-center gap-3 rounded-lg px-3 py-2"
           style={{
-            background: hasSelection ? "#1A1A1A" : "#141414",
-            border: hasSelection ? "1px solid #FF2D2D" : "1px solid #1F1F1F",
+            background: hasSelection ? "#141820" : "#141414",
+            border: hasSelection ? "1px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
           }}
         >
           {/* Select all checkbox */}
@@ -438,8 +438,8 @@ export function LibraryView({
             onClick={handleSelectAll}
             className="flex h-5 w-5 shrink-0 items-center justify-center rounded"
             style={{
-              background: allSelected ? "#FF2D2D" : "transparent",
-              border: allSelected ? "1.5px solid #FF2D2D" : "1.5px solid #555",
+              background: allSelected ? "#ff3333" : "transparent",
+              border: allSelected ? "1.5px solid #ff3333" : "1.5px solid #555",
             }}
             title={allSelected ? "Deselect all" : "Select all"}
           >
@@ -459,7 +459,7 @@ export function LibraryView({
           >
             {hasSelection ? (
               <>
-                <span style={{ fontFamily: "var(--font-mono)", color: "#FF2D2D" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "#ff3333" }}>
                   {selectedIds.size}
                 </span>{" "}
                 selected
@@ -479,7 +479,7 @@ export function LibraryView({
                   style={actionBtnStyle}
                 >
                   <span className="flex items-center gap-1.5">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FF2D2D" stroke="#FF2D2D" strokeWidth="2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff3333" stroke="#ff3333" strokeWidth="2">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                     Favorite
@@ -514,9 +514,9 @@ export function LibraryView({
                   onClick={handleBulkDelete}
                   style={{
                     ...actionBtnStyle,
-                    border: "1px solid #FF2D2D",
+                    border: "1px solid #ff3333",
                     background: "rgba(255, 45, 45, 0.1)",
-                    color: "#FF2D2D",
+                    color: "#ff3333",
                   }}
                 >
                   Delete
@@ -526,7 +526,7 @@ export function LibraryView({
                   onClick={handleClearSelection}
                   style={{
                     ...actionBtnStyle,
-                    border: "1px solid #1F1F1F",
+                    border: "1px solid rgba(255, 255, 255, 0.07)",
                     background: "transparent",
                     color: "#888",
                   }}
@@ -547,12 +547,12 @@ export function LibraryView({
               border: "1px solid rgba(255, 45, 45, 0.2)",
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#FF2D2D" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#ff3333" }}>
               {fetchError}
             </span>
             <button

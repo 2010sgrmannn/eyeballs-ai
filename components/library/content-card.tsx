@@ -50,8 +50,8 @@ export function ContentCard({
     <div
       className="group flex w-full flex-col overflow-hidden text-left transition-all duration-200 ease-out"
       style={{
-        border: isSelected ? "2px solid #FF2D2D" : "1px solid #1F1F1F",
-        background: "#1A1A1A",
+        border: isSelected ? "2px solid #ff3333" : "1px solid rgba(255, 255, 255, 0.07)",
+        background: "#141820",
         borderRadius: "12px",
       }}
     >
@@ -60,7 +60,7 @@ export function ContentCard({
         type="button"
         onClick={() => onClick(content)}
         className="relative w-full overflow-hidden rounded-t-lg hover:brightness-110 transition-all duration-200"
-        style={{ aspectRatio: "9/16", background: "#0A0A0A" }}
+        style={{ aspectRatio: "9/16", background: "#080a0c" }}
       >
         {content.thumbnail_url ? (
           <img
@@ -84,7 +84,7 @@ export function ContentCard({
               className="flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110"
               style={{ background: "rgba(255, 255, 255, 0.9)" }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0A0A0A">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#080a0c">
                 <polygon points="8,5 20,12 8,19" />
               </svg>
             </div>
@@ -107,7 +107,7 @@ export function ContentCard({
           className="absolute bottom-0 left-0 right-0 flex items-center gap-3 px-3 py-2"
           style={{ background: "linear-gradient(transparent, rgba(10, 10, 10, 0.95))" }}
         >
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#FF2D2D" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#ff3333" }}>
             {formatNumber(content.view_count)} views
           </span>
           <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "#888" }}>
@@ -143,7 +143,7 @@ export function ContentCard({
                 className="flex h-7 w-7 items-center justify-center rounded-md transition-all duration-150 hover:bg-[#2A2A2A]"
                 title={isFavorited ? "Remove from favorites" : "Add to favorites"}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill={isFavorited ? "#FF2D2D" : "none"} stroke={isFavorited ? "#FF2D2D" : "#555"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill={isFavorited ? "#ff3333" : "none"} stroke={isFavorited ? "#ff3333" : "#555"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </button>
@@ -162,8 +162,8 @@ export function ContentCard({
                 <div
                   className="flex h-4 w-4 items-center justify-center rounded"
                   style={{
-                    background: isSelected ? "#FF2D2D" : "transparent",
-                    border: isSelected ? "1.5px solid #FF2D2D" : "1.5px solid #555",
+                    background: isSelected ? "#ff3333" : "transparent",
+                    border: isSelected ? "1.5px solid #ff3333" : "1.5px solid #555",
                   }}
                 >
                   {isSelected && (

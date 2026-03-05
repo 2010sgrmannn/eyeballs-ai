@@ -33,7 +33,7 @@ export function ContentFolderNode({ id, data }: NodeProps<Node<CanvasNodeData>>)
               folder_name: selected?.name || undefined,
             });
           }}
-          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] focus:outline-none focus:border-[#6366F1]"
+          className="w-full text-xs px-2 py-1.5 rounded-md bg-white/5 border border-white/[0.08] text-[#FAFAFA] focus:outline-none focus:border-[#ff3333]"
           style={{ fontFamily: "var(--font-body)" }}
         >
           <option value="">Select a folder...</option>

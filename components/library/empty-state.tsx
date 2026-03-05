@@ -2,7 +2,7 @@ export function EmptyState({ hasFilters }: { hasFilters: boolean }) {
   return (
     <div
       className="flex flex-col items-center justify-center rounded-lg py-16"
-      style={{ border: "1px dashed #1F1F1F" }}
+      style={{ border: "1px dashed rgba(255, 255, 255, 0.07)" }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

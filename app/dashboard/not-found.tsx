@@ -17,7 +17,7 @@ export default function DashboardNotFound() {
             fontFamily: "var(--font-mono)",
             fontSize: "48px",
             fontWeight: 700,
-            color: "#FF2D2D",
+            color: "#ff3333",
           }}
         >
           404
@@ -52,7 +52,7 @@ export default function DashboardNotFound() {
           style={{
             fontFamily: "var(--font-body)",
             fontSize: "14px",
-            background: "#FF2D2D",
+            background: "#ff3333",
             color: "#fff",
           }}
         >
